@@ -5,7 +5,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties({
-    EcisLoginSettings.class, EcisJwtSettings.class, EcisAuditSettings.class
+    EcisLoginSettings.class, EcisJwtSettings.class, EcisAuditSettings.class,
+    EcisAppSettings.class
 })
 public class SettingsConfig {
     

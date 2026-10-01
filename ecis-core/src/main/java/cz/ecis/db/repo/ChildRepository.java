@@ -1,11 +1,9 @@
 package cz.ecis.db.repo;
 
-import java.util.List;
-
+import cz.ecis.core.repo.CampAwareRepository;
 import cz.ecis.core.repo.VersionAwareRepository;
 import cz.ecis.db.ent.ChildEnt;
 
-public interface ChildRepository extends VersionAwareRepository<ChildEnt, Long> {
+public interface ChildRepository extends VersionAwareRepository<ChildEnt, Long>, CampAwareRepository<ChildEnt, Long> {
 
-    List<ChildEnt> findAllByCampId(Long campId);
 }

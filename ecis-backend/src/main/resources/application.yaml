@@ -64,7 +64,7 @@ springdoc:
 
 # application.yml
 
-server-url: http://localhost:8081
+# server-url: http://localhost:8081
   # realm: manag3d
   # client-id: manag3d-backend
   # client-secret: AlqnKQYFiYr5iGYrWXYVD8G1LCeML52J
@@ -72,6 +72,8 @@ server-url: http://localhost:8081
   # sync-failure-retries: 5
 
 ecis:
+  app:
+    displayAppName: DevApp
   login:
     enableAttemptProtection: true
     enablePasswordExpiration: true

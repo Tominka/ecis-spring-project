@@ -1,8 +1,5 @@
 package cz.ecis.db.ent;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.envers.Audited;
@@ -18,19 +15,18 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(schema = "ecis", name = "child")
+@Table(schema = "ecis", name = "parent")
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @Audited
-public class ChildEnt extends VersionAwareEntity<Long> implements ILovEntity, ICampEntity {
+public class ParentEnt extends VersionAwareEntity<Long> implements ILovEntity, ICampEntity {
 
     @Column(name = "name", length = 255, nullable = false)
     private String name;
@@ -38,42 +34,29 @@ public class ChildEnt extends VersionAwareEntity<Long> implements ILovEntity, IC
     @Column(name = "surname", length = 255, nullable = false)
     private String surname;
 
-    @Column(name = "address", length = 510, nullable = false)
+    @Column(name = "address", length = 510, nullable = true)
     private String address;
 
-    @Column(name = "birthdate", nullable = false)
-    private LocalDate birthdate;
+    @Column(name = "phone", length = 19, nullable = true)
+    private String phone;
+
+    @Column(name = "email", length = 255, nullable = true)
+    private String email;
 
     @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_camp", referencedColumnName = "id", updatable = true, insertable = true, nullable = false)
     private CampEnt camp;
 
-    @Column(name = "confirmed_at", nullable = false)
-    private OffsetDateTime confirmedAt;
-
-    @Column(name = "canceled_at", nullable = false)
-    private OffsetDateTime canceledAt;
-
     // @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     // @ManyToMany(fetch = FetchType.LAZY)
     // @JoinTable(
     //     schema = "ecis",
     //     name = "child_parent",
-    //     joinColumns = @JoinColumn(name = "id_child"),
-    //     inverseJoinColumns = @JoinColumn(name = "id_parent")
+    //     joinColumns = @JoinColumn(name = "id_parent"),
+    //     inverseJoinColumns = @JoinColumn(name = "id_child")
     // )
-    // private Set<ParentEnt> parents;
-
-    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        schema = "ecis",
-        name = "child_info",
-        joinColumns = @JoinColumn(name = "id_child"),
-        inverseJoinColumns = @JoinColumn(name = "id")
-    )
-    private List<ChildInfoEnt> info;
+    // private Set<ChildEnt> children;
 
     @Override
     public String getLabel() {

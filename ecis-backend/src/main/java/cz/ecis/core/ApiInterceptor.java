@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import cz.ecis.core.security.EcisUserDetails;
+import cz.ecis.localization.EcisLocaleContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -32,6 +33,7 @@ public class ApiInterceptor implements HandlerInterceptor {
         }
 
         EcisContext.getRequest().setSource("APP");
+        EcisLocaleContext.init(request);
 
         LOGGER.info("Called API");
 

@@ -1,0 +1,161 @@
+openapi: 3.0.1
+info:
+  title: Parent API
+  description: API definiton for parents
+  version: 1.0.0
+tags:
+  -
+    name: Parents
+    description: APIs for managing parents in system
+servers:
+  - url: /api/v1
+    description: Local development server
+
+paths:
+  /parent:
+    get:
+      tags:
+        - Parents
+      operationId: getAllParents
+      security:
+        - bearerAuth: []
+        - campContext: []
+      responses:
+        "200":
+          description: Fetched parents in specified camp
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ParentDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+  /parent/lov:
+    get:
+      tags:
+        - Parents
+      operationId: getAllParentsLov
+      security:
+        - bearerAuth: []
+        - campContext: []
+      responses:
+        "200":
+          description: Fetched parents LOV in specified camp
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LovDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+components:
+  schemas:
+    ParentDto:
+      type: object
+      required:
+        - name
+        - surname
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          maxLength: 255
+        surname:
+          type: string
+          maxLength: 255
+        address:
+          type: string
+          maxLength: 510
+        phone:
+          $ref: "#/components/schemas/PhoneNumber"
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedBy:
+          type: string
+        version:
+          type: integer
+          format: int32
+
+    PhoneNumber:
+      type: string
+      pattern: '^(\\+?\\d{1,3}[-.\\s]?)?(\\(?\\d{3}\\)?[-.\\s]?)?\\d{3}[-.\\s]?\\d{4}$'
+      maxLength: 19
+
+    LovDto:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+
+    ErrorDto:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+        timestamp:
+          type: string
+
+  securitySchemes:
+    campContext:
+      type: apiKey
+      in: header
+      name: X-Camp-Id
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

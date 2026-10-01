@@ -117,6 +117,7 @@
 					<execution>
 						<goals>
 							<goal>repackage</goal>
+							<goal>build-info</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -150,7 +151,6 @@
 								ErrorDto=cz.ecis.core.model.ErrorDto
 							</typeMappings>
 							<configOptions>
-								<!-- <useTags>true</useTags> -->
 								<useSpringBoot4>true</useSpringBoot4>
 								<interfaceOnly>true</interfaceOnly>
 								<useBeanValidation>true</useBeanValidation>
@@ -179,6 +179,7 @@
 								ErrorDto=cz.ecis.core.model.ErrorDto
 							</typeMappings>
 							<configOptions>
+								<useSpringBoot4>true</useSpringBoot4>
 								<interfaceOnly>true</interfaceOnly>
 								<useBeanValidation>true</useBeanValidation>
 								<delegatePattern>false</delegatePattern>
@@ -206,6 +207,91 @@
 								ErrorDto=cz.ecis.core.model.ErrorDto
 							</typeMappings>
 							<configOptions>
+								<useSpringBoot4>true</useSpringBoot4>
+								<interfaceOnly>true</interfaceOnly>
+								<useBeanValidation>true</useBeanValidation>
+								<delegatePattern>false</delegatePattern>
+								<useJakartaEe>true</useJakartaEe>
+							</configOptions>
+						</configuration>
+					</execution>
+					<execution>
+						<id>parent</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/openapi/parent.yaml</inputSpec>
+							<generatorName>spring</generatorName>
+							<apiPackage>cz.ecis.api</apiPackage>
+							<modelPackage>cz.ecis.model.dto</modelPackage>
+							<apiNameSuffix>ApiInterface</apiNameSuffix>
+							<importMappings>
+								LovDto=cz.ecis.core.model.LovDto,
+								ErrorDto=cz.ecis.core.model.ErrorDto
+							</importMappings>
+							<typeMappings>
+								LovDto=cz.ecis.core.model.LovDto,
+								ErrorDto=cz.ecis.core.model.ErrorDto
+							</typeMappings>
+							<configOptions>
+								<useSpringBoot4>true</useSpringBoot4>
+								<interfaceOnly>true</interfaceOnly>
+								<useBeanValidation>true</useBeanValidation>
+								<delegatePattern>false</delegatePattern>
+								<useJakartaEe>true</useJakartaEe>
+							</configOptions>
+						</configuration>
+					</execution>
+					<execution>
+						<id>lookup</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/openapi/lookup.yaml</inputSpec>
+							<generatorName>spring</generatorName>
+							<apiPackage>cz.ecis.api</apiPackage>
+							<modelPackage>cz.ecis.model.dto</modelPackage>
+							<apiNameSuffix>ApiInterface</apiNameSuffix>
+							<importMappings>
+								LovDto=cz.ecis.core.model.LovDto,
+								ErrorDto=cz.ecis.core.model.ErrorDto
+							</importMappings>
+							<typeMappings>
+								LovDto=cz.ecis.core.model.LovDto,
+								ErrorDto=cz.ecis.core.model.ErrorDto
+							</typeMappings>
+							<configOptions>
+								<useSpringBoot4>true</useSpringBoot4>
+								<interfaceOnly>true</interfaceOnly>
+								<useBeanValidation>true</useBeanValidation>
+								<delegatePattern>false</delegatePattern>
+								<useJakartaEe>true</useJakartaEe>
+							</configOptions>
+						</configuration>
+					</execution>
+					<execution>
+						<id>env</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/openapi/env.yaml</inputSpec>
+							<generatorName>spring</generatorName>
+							<apiPackage>cz.ecis.api</apiPackage>
+							<modelPackage>cz.ecis.model.dto</modelPackage>
+							<apiNameSuffix>ApiInterface</apiNameSuffix>
+							<importMappings>
+								EnvTypeEnum=cz.ecis.core.environment.EnvTypeEnum,
+								ErrorDto=cz.ecis.core.model.ErrorDto
+							</importMappings>
+							<typeMappings>
+								EnvTypeEnum=cz.ecis.core.environment.EnvTypeEnum,
+								ErrorDto=cz.ecis.core.model.ErrorDto
+							</typeMappings>
+							<configOptions>
+								<useSpringBoot4>true</useSpringBoot4>
 								<interfaceOnly>true</interfaceOnly>
 								<useBeanValidation>true</useBeanValidation>
 								<delegatePattern>false</delegatePattern>

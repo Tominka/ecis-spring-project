@@ -103,7 +103,7 @@ public class LoginService {
             }
             
             if (
-                user.getPasswordChanged().isAfter(OffsetDateTime.now(ZoneId.systemDefault()).minusDays(this.ecisLoginSettings.passwordExpirationTime()))
+                user.getPasswordChanged().isBefore(OffsetDateTime.now(ZoneId.systemDefault()).minusDays(this.ecisLoginSettings.passwordExpirationTime()))
             ) {
                 this.invalidLogin(attempt);
                 this.logLoginRepository.save(this.loginMapper.createLogLogin(ipAddress, user.getUsername(), false, true));

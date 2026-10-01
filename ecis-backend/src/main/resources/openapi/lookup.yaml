@@ -1,0 +1,162 @@
+openapi: 3.0.1
+info:
+  title: Lookup API
+  description: API definiton for lookups
+  version: 1.0.0
+tags:
+  -
+    name: Lookup
+    description: APIs for managing lookups in system
+servers:
+  - url: /api/v1
+    description: Local development server
+
+paths:
+  /child-info:
+    get:
+      tags:
+        - Lookup
+      operationId: getAllLkpChildInfo
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Fetched child info lookup values
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LookupBaseDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "403":
+          description: Missing required role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+  /child-info/lov:
+    get:
+      tags:
+        - Lookup
+      operationId: getAllLkpChildInfoLov
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Fetched child info in lov
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LovDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+components:
+  schemas:
+    LookupBaseDto:
+      type: object
+      required:
+        - name
+        - code
+        - valid_from
+        - version
+      properties:
+        id:
+          type: integer
+          format: int64
+        translations:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              name:
+                type: string
+                maxLength: 255
+              description:
+                type: string
+        code:
+          type: string
+          maxLength: 50
+        validFrom:
+          type: string
+          format: date-time
+        validTo:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
+        version:
+          type: integer
+          format: int32
+
+    LovDto:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+
+    ErrorDto:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+        timestamp:
+          type: string
+
+  securitySchemes:
+    # campContext:
+    #   type: apiKey
+    #   in: header
+    #   name: X-Camp-Id
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

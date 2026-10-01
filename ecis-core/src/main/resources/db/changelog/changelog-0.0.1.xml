@@ -1,0 +1,1193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+    logicalFilePath="changelog-0.0.1.xml"
+>
+
+    <changeSet id="0-init-db-schemas" author="Tom">
+        <sql dbms="postgresql" endDelimiter=";">
+            CREATE SCHEMA IF NOT EXISTS ecis;
+            CREATE SCHEMA IF NOT EXISTS security;
+            CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+            GRANT USAGE ON SCHEMA ecis TO ecis_apl;
+            GRANT USAGE ON SCHEMA security TO ecis_apl;
+        </sql>
+    </changeSet>
+
+    <changeSet id="1-create-role-table" author="Tom">
+        <createTable schemaName="security" tableName="role">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="global" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex schemaName="security" tableName="role" indexName="role_code_idx">
+            <column name="code"/>
+        </createIndex>
+
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT ON TABLE security.role TO ecis_apl;
+        </sql>
+    </changeSet>
+
+    <changeSet id="2-create-camp-table" author="Tom">
+        <createTable schemaName="ecis" tableName="camp">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="DOUBLE" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_from" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_to" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="archived_at" type="timestamp with time zone"/>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT ON TABLE ecis.camp TO ecis_apl;
+        </sql>
+    </changeSet>
+
+    <changeSet id="3-create-user-table" author="Tom">
+        <createTable schemaName="security" tableName="user_settings">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column defaultValue="/" name="default_page" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="default_page_after_login" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="default_page_after_refresh" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_camp" type="BIGINT"/>
+            <column name="auto_filter_by_selected_encampment" type="boolean" defaultValueBoolean="false"/>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable schemaName="security" tableName="user">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="surname" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="system_admin" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password_changed" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="id_user_settings" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted_at" type="timestamp with time zone"/>
+            <column name="2fa_enabled" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="2fa_secret" type="VARCHAR(255)"/>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE security.user_settings TO ecis_apl;
+            GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE security.user TO ecis_apl;
+        </sql>
+    </changeSet>
+
+    <changeSet id="3-create-relation-user-table" author="Tom">
+        <createIndex schemaName="security" tableName="user" indexName="user_username_idx" unique="true">
+            <column name="username"/>
+        </createIndex>
+
+        <createIndex schemaName="security" tableName="user" indexName="user_user_settings_id_idx" unique="true">
+            <column name="id_user_settings" />
+        </createIndex>
+
+        <addForeignKeyConstraint constraintName="user_user_settings_id_fkey"
+            baseColumnNames="id_user_settings" baseTableSchemaName="security" baseTableName="user"
+            referencedColumnNames="id" referencedTableSchemaName="security" referencedTableName="user_settings"
+            onDelete="RESTRICT" onUpdate="RESTRICT"
+        />
+    </changeSet>
+
+    <changeSet id="4-create-camps-role-table" author="Tom">
+        <createTable schemaName="security" tableName="camp_role">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="id_user" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="id_role" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="id_camp" type="BIGINT">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE security.camp_role TO ecis_apl;
+        </sql>
+    </changeSet>
+
+    <changeSet id="4-create-relations-camp-table" author="Tom">
+        <addUniqueConstraint schemaName="security" tableName="camp_role"
+            columnNames="id_user, id_role, id_camp"
+            constraintName="camp_role_id_user_id_role_id_camp_idx"
+        />
+
+        <createIndex schemaName="security" tableName="camp_role" indexName="camp_role_id_role_idx">
+            <column name="id_role" />
+        </createIndex>
+        <createIndex schemaName="security" tableName="camp_role" indexName="camp_role_id_user_idx" >
+            <column name="id_user" />
+        </createIndex>
+        <createIndex schemaName="security" tableName="camp_role" indexName="camp_role_id_camp_idx" >
+            <column name="id_camp" />
+        </createIndex>
+
+        <addForeignKeyConstraint constraintName="camp_role_role_id_fkey"
+            baseColumnNames="id_role" baseTableSchemaName="security" baseTableName="camp_role"
+            referencedColumnNames="id" referencedTableSchemaName="security" referencedTableName="role"
+            onDelete="RESTRICT" onUpdate="RESTRICT"
+        />
+
+        <addForeignKeyConstraint constraintName="camp_role_user_id_fkey"
+            baseColumnNames="id_user" baseTableSchemaName="security" baseTableName="camp_role"
+            referencedColumnNames="id" referencedTableSchemaName="security" referencedTableName="user"
+            onDelete="RESTRICT" onUpdate="RESTRICT"
+        />
+
+        <addForeignKeyConstraint constraintName="camp_role_camp_id_fkey"
+            baseColumnNames="id_camp" baseTableSchemaName="security" baseTableName="camp_role"
+            referencedColumnNames="id" referencedTableSchemaName="ecis" referencedTableName="camp"
+            onDelete="RESTRICT" onUpdate="RESTRICT"
+        />
+    </changeSet>
+
+    <changeSet id="4-users-camp-roles-data" author="Tom">
+        <sql dbms="postgresql" endDelimiter=";">
+            INSERT INTO security.role (name,code,enabled,global,created_by) VALUES
+            ('USER','00000',true,false,'SYSTEM'),
+            ('ENCAMPMENT_READ','10000',true,false,'SYSTEM'),
+            ('ENCAMPMENT_DELETE','10001',true,true,'SYSTEM'),
+            ('ENCAMPMENT_CREATE','10002',true,true,'SYSTEM'),
+            ('ENCAMPMENT_EDIT','10003',true,true,'SYSTEM'),
+            ('CHILDREN_READ','20000',true,false,'SYSTEM'),
+            ('CHILDREN_MERGE','20001',true,false,'SYSTEM'),
+            ('CHILDREN_APPLICATION_READ','20002',true,false,'SYSTEM'),
+            ('CHILDREN_ENCAMPMENT_LIST_DOWNLOAD','20003',true,false,'SYSTEM'),
+            ('CHILDREN_ENCAMPMENT_ASSIGN','20004',true,false,'SYSTEM');
+
+            INSERT INTO security.role (name,code,enabled,global,created_by) VALUES
+            ('CHILDREN_IMPORT','20005',true,false,'SYSTEM'),
+            ('PARENTS_READ','30000',true,false,'SYSTEM'),
+            ('INJURIES_READ','40000',true,false,'SYSTEM'),
+            ('INJURIES_CREATE','40001',true,false,'SYSTEM'),
+            ('INJURIES_DELETE','40002',true,false,'SYSTEM'),
+            ('INJURIES_REPORT_DOWNLOAD','40003',true,false,'SYSTEM'),
+            ('MEDICAMENTS_OVERVIEW_READ','50000',true,false,'SYSTEM'),
+            ('MEDICAMENTS_HISTORY_READ','50001',true,false,'SYSTEM'),
+            ('MEDICAMENT_DISPOSE','50002',true,false,'SYSTEM'),
+            ('APPLICATION_ARCHIVIST','60000',false,false,'SYSTEM');
+
+            INSERT INTO security.role (name,code,enabled,global,created_by) VALUES
+            ('APPLICATION_SHREDDER','60001',false,false,'SYSTEM'),
+            ('APPLICATION_DOWNLOAD','60002',true,false,'SYSTEM'),
+            ('TEST_FORM','70000',false,false,'SYSTEM'),
+            ('CAMP_ARCHIVIST','10004',false,true,'SYSTEM'),
+            ('CHILDREN_CONFIRMATION','20006',true,false,'SYSTEM'),
+            ('MEDICAMENT_ADD','50003',true,false,'SYSTEM'),
+            ('MEDICAMENT_EDIT','50004',true,false,'SYSTEM'),
+            ('MEDICAMENT_DELETE','50005',true,false,'SYSTEM'),
+            ('PARENTS_CONTACTS_READER','30004',true,true,'SYSTEM');
+        </sql>
+    </changeSet>
+
+    <changeSet id="5-add-log-schema" author="Tom">
+        <sql dbms="postgresql" endDelimiter=";">
+            CREATE SCHEMA IF NOT EXISTS log;
+            CREATE SCHEMA IF NOT EXISTS security;
+
+            GRANT USAGE ON SCHEMA log TO ecis_apl;
+        </sql>
+    </changeSet>
+
+    <changeSet id="6-create-log-tables" author="Tom">
+        <createTable schemaName="log" tableName="log_entry">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="id_user" type="BIGINT">
+                <constraints nullable="true" />
+            </column>
+            <column name="session" type="VARCHAR(64)">
+                <constraints nullable="true" />
+            </column>
+            <column name="ip_address" type="VARCHAR(45)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_agent" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="point" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authenticated" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authorized" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password_expired" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_refresh" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT ON TABLE log.log_entry TO ecis_apl;
+        </sql>
+    </changeSet>
+
+    <changeSet id="7-create_log_login_table" author="Tom">
+        <createTable schemaName="log" tableName="log_login">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ip_address" type="VARCHAR(45)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="logged_in_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authorized" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password_expired" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT ON TABLE log.log_login TO ecis_apl;
+        </sql>
+    </changeSet>
+
+    <changeSet id="8-create-login-attempts-table" author="Tom">
+        <createTable schemaName="security" tableName="login_attempt">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="attempts_max" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ip_address" type="VARCHAR(45)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attempts_current" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attempts_total" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_attempt" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="history" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unblocked_count" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unblocked_count_user" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex schemaName="security" tableName="login_attempt" indexName="login_attempt_ip_address_history_idx">
+            <column name="ip_address" />
+            <column name="history" />
+        </createIndex>
+
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT ON TABLE security.login_attempt TO ecis_apl;
+        </sql>
+    </changeSet>
+
+    <changeSet id="9-create-refresh-token-table" author="Tom">
+        <createTable schemaName="security" tableName="refresh_token">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="ip_address" type="VARCHAR(45)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="user_agent" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="id_user" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="session" type="VARCHAR(64)">
+                <constraints nullable="false" />
+            </column>
+            <column name="expires_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="revoked_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="revoked_by_logout" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex schemaName="security" tableName="refresh_token"
+            indexName="refresh_token_session_idx" unique="true"
+        >
+            <column name="session" />
+        </createIndex>
+
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT ON TABLE security.refresh_token TO ecis_apl;
+        </sql>
+    </changeSet>
+
+    <changeSet id="10-create-audit-schema" author="Tom">
+        <sql dbms="postgresql" endDelimiter=";">
+            CREATE SCHEMA IF NOT EXISTS audit;
+
+            GRANT USAGE ON SCHEMA audit TO ecis_apl;
+        </sql>
+
+        <createTable schemaName="audit" tableName="revision">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source" type="VARCHAR(30)"/>
+            <column name="id_correlation" type="VARCHAR(100)"/>
+        </createTable>
+
+        <createTable schemaName="audit" tableName="camp_history">
+            <column name="id" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_revision" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="revision_type" type="smallint" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)" />
+            <column name="location" type="VARCHAR(255)" />
+            <column name="price" type="DOUBLE" />
+            <column name="date_from" type="date" />
+            <column name="date_to" type="date" />
+            <column name="enabled" type="boolean" />
+            <column name="archived_at" type="timestamp with time zone" />
+            <column name="created_at" type="timestamp with time zone" />
+            <column name="created_by" type="VARCHAR(255)" />
+            <column name="updated_at" type="timestamp with time zone" />
+            <column name="updated_by" type="VARCHAR(255)" />
+            <column name="version" type="INT UNSIGNED" />
+        </createTable>
+
+        <addPrimaryKey schemaName="audit" tableName="camp_history"
+            columnNames="id,id_revision"
+            constraintName="camp_history_pk" />
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="audit"
+            baseTableName="camp_history"
+            baseColumnNames="id_revision"
+            referencedTableSchemaName="audit"
+            referencedTableName="revision"
+            referencedColumnNames="id"
+            constraintName="camp_history_revision_fk"
+        />
+
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT ON TABLE audit.revision TO ecis_apl;
+            GRANT SELECT, UPDATE, INSERT ON TABLE audit.camp_history TO ecis_apl;
+        </sql>
+
+    </changeSet>
+
+    <changeSet id="11-role-rename" author="Tom">
+        <sql dbms="postgresql" endDelimiter=";">
+            UPDATE security.role SET name = 'CAMP_READ' WHERE name = 'ENCAMPMENT_READ';
+            UPDATE security.role SET name = 'CAMP_DELETE' WHERE name = 'ENCAMPMENT_DELETE';
+            UPDATE security.role SET name = 'CAMP_CREATE' WHERE name = 'ENCAMPMENT_CREATE';
+            UPDATE security.role SET name = 'CAMP_EDIT' WHERE name = 'ENCAMPMENT_EDIT';
+        </sql>
+
+    </changeSet>
+
+    <changeSet id="11-create-child-table" author="Tom">
+
+        <createTable schemaName="ecis" tableName="child">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="surname" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="VARCHAR(510)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="birthdate" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_camp" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="confirmed_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="canceled_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="ecis"
+            baseTableName="child"
+            baseColumnNames="id_camp"
+            referencedTableSchemaName="ecis"
+            referencedTableName="camp"
+            referencedColumnNames="id"
+            constraintName="child_id_camp_fk"
+        />
+
+        <createTable schemaName="audit" tableName="child_history">
+            <column name="id" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_revision" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="revision_type" type="smallint" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)" />
+            <column name="surname" type="VARCHAR(255)" />
+            <column name="address" type="VARCHAR(510)" />
+            <column name="birthdate" type="date" />
+            <column name="id_camp" type="BIGINT" />
+            <column name="confirmed_at" type="timestamp with time zone" />
+            <column name="canceled_at" type="timestamp with time zone" />
+            <column name="created_at" type="timestamp with time zone" />
+            <column name="created_by" type="VARCHAR(255)" />
+            <column name="updated_at" type="timestamp with time zone" />
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" />
+        </createTable>
+
+        <addPrimaryKey schemaName="audit" tableName="child_history"
+            columnNames="id,id_revision"
+            constraintName="child_history_pk" />
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="audit"
+            baseTableName="child_history"
+            baseColumnNames="id_revision"
+            referencedTableSchemaName="audit"
+            referencedTableName="revision"
+            referencedColumnNames="id"
+            constraintName="child_history_revision_fk"
+        />
+
+    </changeSet>
+
+    <changeSet id="12-child-info-lookup" author="Tom">
+
+          <sql dbms="postgresql" endDelimiter=";">
+            CREATE SCHEMA IF NOT EXISTS lookup;
+
+            GRANT USAGE ON SCHEMA lookup TO ecis_apl;
+        </sql>
+
+        <createTable schemaName="lookup" tableName="lkp_child_info">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="translations" type="JSONB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="valid_from" type="timestamp with time zone">
+                <constraints nullable="false" />
+            </column>
+            <column name="valid_to" type="timestamp with time zone" />
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable schemaName="audit" tableName="lkp_child_info_history">
+            <column name="id" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_revision" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="revision_type" type="smallint" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(50)"/>
+            <column name="translations" type="JSONB" />
+            <column name="valid_from" type="timestamp with time zone"/>
+            <column name="valid_to" type="timestamp with time zone" />
+            <column name="created_at" type="timestamp with time zone" />
+            <column name="created_by" type="VARCHAR(255)" />
+            <column name="updated_at" type="timestamp with time zone" />
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" />
+        </createTable>
+
+        <addPrimaryKey schemaName="audit" tableName="lkp_child_info_history"
+            columnNames="id,id_revision"
+            constraintName="lkp_child_info_history_pk" />
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="audit"
+            baseTableName="lkp_child_info_history"
+            baseColumnNames="id_revision"
+            referencedTableSchemaName="audit"
+            referencedTableName="revision"
+            referencedColumnNames="id"
+            constraintName="lkp_child_info_history_revision_fk"
+        />
+
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT ON TABLE lookup.lkp_child_info TO ecis_apl;
+            GRANT SELECT, UPDATE, INSERT ON TABLE audit.lkp_child_info_history TO ecis_apl;
+        </sql>
+        
+        <loadData
+            file="db/data/data-0.0.1-lookup_child_info.csv"
+            schemaName="lookup"
+            tableName="lkp_child_info"
+            separator=","
+        />
+        <sql dbms="postgresql" endDelimiter=";">
+            WITH new_revision AS (
+                INSERT INTO audit.revision (created_at, username, source)
+                VALUES (current_timestamp, 'SYSTEM', 'SCRIPT')
+                RETURNING id
+            )
+            INSERT INTO audit.lkp_child_info_history (
+                id, id_revision, revision_type, code, translations, valid_from, valid_to, created_at, created_by, updated_at, updated_by, version
+            )
+            SELECT l.id, r.id, 0, l.code, l.translations, l.valid_from, l.valid_to, l.created_at, l.created_by, l.updated_at, l.updated_by, l.version
+            FROM lookup.lkp_child_info l
+            CROSS JOIN new_revision r;
+        </sql>
+    </changeSet>
+
+     <changeSet id="13-create-child-info-table" author="Tom">
+
+        <createTable schemaName="ecis" tableName="child_info">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="id_child" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_child_info" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="ecis"
+            baseTableName="child_info"
+            baseColumnNames="id_child"
+            referencedTableSchemaName="ecis"
+            referencedTableName="child"
+            referencedColumnNames="id"
+            constraintName="child_info_id_child_fk"
+        />
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="ecis"
+            baseTableName="child_info"
+            baseColumnNames="id_child_info"
+            referencedTableSchemaName="lookup"
+            referencedTableName="lkp_child_info"
+            referencedColumnNames="id"
+            constraintName="child_info_id_lkp_child_info_fk"
+        />
+
+        <createTable schemaName="audit" tableName="child_info_history">
+            <column name="id" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_revision" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="revision_type" type="smallint" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_child" type="BIGINT" />
+            <column name="id_child_info" type="BIGINT"/>
+            <column name="value" type="TEXT" />
+            <column name="created_at" type="timestamp with time zone" />
+            <column name="created_by" type="VARCHAR(255)" />
+            <column name="updated_at" type="timestamp with time zone" />
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" />
+        </createTable>
+
+        <addPrimaryKey schemaName="audit" tableName="child_info_history"
+            columnNames="id,id_revision"
+            constraintName="child_info_history_pk" />
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="audit"
+            baseTableName="child_info_history"
+            baseColumnNames="id_revision"
+            referencedTableSchemaName="audit"
+            referencedTableName="revision"
+            referencedColumnNames="id"
+            constraintName="child_info_history_revision_fk"
+        />
+
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT ON TABLE ecis.child_info TO ecis_apl;
+            GRANT SELECT, UPDATE, INSERT ON TABLE audit.child_info_history TO ecis_apl;
+        </sql>
+
+    </changeSet>
+
+    <changeSet id="14-create-parent-table" author="Tom">
+
+        <createTable schemaName="ecis" tableName="parent">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="surname" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="VARCHAR(510)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone" type="VARCHAR(19)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="id_camp" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="ecis"
+            baseTableName="parent"
+            baseColumnNames="id_camp"
+            referencedTableSchemaName="ecis"
+            referencedTableName="camp"
+            referencedColumnNames="id"
+            constraintName="parent_id_camp_fk"
+        />
+
+        <createTable schemaName="audit" tableName="parent_history">
+            <column name="id" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_revision" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="revision_type" type="smallint" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)" />
+            <column name="surname" type="VARCHAR(255)" />
+            <column name="address" type="VARCHAR(510)" />
+            <column name="phone" type="VARCHAR(19)" />
+            <column name="email" type="VARCHAR(255)" />
+            <column name="id_camp" type="BIGINT" />
+            <column name="created_at" type="timestamp with time zone" />
+            <column name="created_by" type="VARCHAR(255)" />
+            <column name="updated_at" type="timestamp with time zone" />
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" />
+        </createTable>
+
+        <addPrimaryKey schemaName="audit" tableName="parent_history"
+            columnNames="id,id_revision"
+            constraintName="parent_history_pk" />
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="audit"
+            baseTableName="parent_history"
+            baseColumnNames="id_revision"
+            referencedTableSchemaName="audit"
+            referencedTableName="revision"
+            referencedColumnNames="id"
+            constraintName="parent_history_revision_fk"
+        />
+
+    </changeSet>
+
+    <changeSet id="15-create-parent-child-relation-table" author="Tom">
+
+        <createTable schemaName="ecis" tableName="child_parent">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="id_child" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_parent" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="ecis"
+            baseTableName="child_parent"
+            baseColumnNames="id_child"
+            referencedTableSchemaName="ecis"
+            referencedTableName="child"
+            referencedColumnNames="id"
+            constraintName="child_parent_id_child_fk"
+        />
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="ecis"
+            baseTableName="child_parent"
+            baseColumnNames="id_parent"
+            referencedTableSchemaName="ecis"
+            referencedTableName="parent"
+            referencedColumnNames="id"
+            constraintName="child_parent_id_parent_fk"
+        />
+
+        <createTable schemaName="audit" tableName="child_parent_history">
+            <column name="id" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_revision" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="revision_type" type="smallint" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_child" type="BIGINT" />
+            <column name="id_parent" type="BIGINT" />
+            <column name="created_at" type="timestamp with time zone" />
+            <column name="created_by" type="VARCHAR(255)" />
+        </createTable>
+
+        <addPrimaryKey schemaName="audit" tableName="child_parent_history"
+            columnNames="id,id_revision"
+            constraintName="child_parent_history_pk" />
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="audit"
+            baseTableName="child_parent_history"
+            baseColumnNames="id_revision"
+            referencedTableSchemaName="audit"
+            referencedTableName="revision"
+            referencedColumnNames="id"
+            constraintName="child_parent_history_revision_fk"
+        />
+
+    </changeSet>
+
+    <changeSet id="16-remove-not-null-camp-date-to" author="Tom">
+        <dropNotNullConstraint schemaName="ecis" tableName="camp" columnName="date_to" />
+    </changeSet>
+
+    <changeSet id="16-add-missing-permissions-parent-child" author="Tom">
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT ON TABLE ecis.child TO ecis_apl;
+            GRANT SELECT, UPDATE, INSERT ON TABLE ecis.parent TO ecis_apl;
+
+            GRANT SELECT, INSERT ON TABLE audit.parent_history TO ecis_apl;
+            GRANT SELECT, INSERT ON TABLE audit.child_history TO ecis_apl;
+        </sql>
+    </changeSet>
+
+    <changeSet id="17-create-application-table" author="Tom">
+
+        <createTable schemaName="ecis" tableName="application">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="id_child" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_camp" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="confirmed_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="canceled_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="ecis"
+            baseTableName="child"
+            baseColumnNames="id_camp"
+            referencedTableSchemaName="ecis"
+            referencedTableName="camp"
+            referencedColumnNames="id"
+            constraintName="application_id_camp_fk"
+        />
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="ecis"
+            baseTableName="application"
+            baseColumnNames="id_child"
+            referencedTableSchemaName="ecis"
+            referencedTableName="child"
+            referencedColumnNames="id"
+            constraintName="application_id_child_fk"
+        />
+
+        <createTable schemaName="audit" tableName="application_history">
+            <column name="id" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_revision" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="revision_type" type="smallint" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_child" type="BIGINT" />
+            <column name="id_camp" type="BIGINT" />
+            <column name="confirmed_at" type="timestamp with time zone" />
+            <column name="canceled_at" type="timestamp with time zone" />
+            <column name="created_at" type="timestamp with time zone" />
+            <column name="created_by" type="VARCHAR(255)" />
+            <column name="updated_at" type="timestamp with time zone" />
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" />
+        </createTable>
+
+        <addPrimaryKey schemaName="audit" tableName="application_history"
+            columnNames="id,id_revision"
+            constraintName="application_history_pk"
+        />
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="audit"
+            baseTableName="application_history"
+            baseColumnNames="id_revision"
+            referencedTableSchemaName="audit"
+            referencedTableName="revision"
+            referencedColumnNames="id"
+            constraintName="application_history_revision_fk"
+        />
+
+        <dropTable schemaName="ecis" tableName="child_parent" />
+
+        <createTable schemaName="ecis" tableName="application_parent">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="id_application" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_parent" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="ecis"
+            baseTableName="application_parent"
+            baseColumnNames="id_application"
+            referencedTableSchemaName="ecis"
+            referencedTableName="application"
+            referencedColumnNames="id"
+            constraintName="application_parent_id_application_fk"
+        />
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="ecis"
+            baseTableName="application_parent"
+            baseColumnNames="id_parent"
+            referencedTableSchemaName="ecis"
+            referencedTableName="parent"
+            referencedColumnNames="id"
+            constraintName="application_parent_id_parent"
+        />
+
+        <createTable schemaName="audit" tableName="application_parent_history">
+            <column name="id" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_revision" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="revision_type" type="smallint" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_application" type="BIGINT" />
+            <column name="id_parent" type="BIGINT" />
+            <column name="created_at" type="timestamp with time zone" />
+            <column name="created_by" type="VARCHAR(255)" />
+            <column name="updated_at" type="timestamp with time zone" />
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" />
+        </createTable>
+
+        <addPrimaryKey schemaName="audit" tableName="application_parent_history"
+            columnNames="id,id_revision"
+            constraintName="application_parent_history_pk"
+        />
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="audit"
+            baseTableName="application_parent_history"
+            baseColumnNames="id_revision"
+            referencedTableSchemaName="audit"
+            referencedTableName="revision"
+            referencedColumnNames="id"
+            constraintName="application_parent_history_revision_fk"
+        />
+
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  ecis-database:
+    image: postgres:18.4
+    container_name: ecis-database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      -  ecis-database-data:/var/lib/postgresql
+      - ./initdb:/docker-entrypoint-initdb.d
+    networks:
+      - ecis-network
+
+  ecis-test-database:
+    image: postgres:18.4
+    container_name: ecis-test-database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    restart: always
+    ports:
+      - "15432:5432"
+    volumes:
+      -  ecis-test-database-data:/var/lib/postgresql
+      - ./initdb:/docker-entrypoint-initdb.d
+
+volumes:
+  ecis-database-data:
+  ecis-test-database-data:
+
+networks:
+  ecis-network:

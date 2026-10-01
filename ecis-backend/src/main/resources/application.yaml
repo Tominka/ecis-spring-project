@@ -1,0 +1,92 @@
+spring:
+  application:
+    name: ECIS backend
+  profiles:
+    active: dev
+  datasource:
+    jdbc-url: jdbc:postgresql://localhost:5432/ecis
+    username: ecis_apl
+    password: ecis_apl
+    driver-class-name: org.postgresql.Driver
+  
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/changelog-master.xml
+    liquibaseSchema: public
+    url: jdbc:postgresql://localhost:5432/ecis
+    user: ecis
+    password: ecis
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+    show-sql: true
+  main:
+    log-startup-info: true
+server:
+  port: 8082
+  # servlet:
+  #   context-path: /api/v1
+  # compression:
+  #   enabled: false
+  #   mime-types: application/json,application/xml,text/html,text/xml,text/plain,text/css,text/javascript,application/javascript
+  # servlet:
+  #   session:
+  #     timeout: 15m
+
+# liquibase:
+#   changelog: classpath:db/changelog/changelog-master.xml
+#   enabled: false
+#   context: null
+
+# management:
+#   endpoints:
+#     web:
+#       exposure:
+#         include: health, info, metrics, beans, scheduledtasks
+#   endpoint:
+#     health:
+#       show-details: always
+
+springdoc:
+  api-docs:
+    enabled: true
+  # swagger-ui:
+  #   enabled: true
+
+# logging.level.org.springframework.security.authorization=TRACE
+# logging.level.org.springframework.security.web.access=TRACE
+#             spring.jpa.properties.hibernate.format_sql=true
+# spring.jpa.show-sql=true
+
+# application.yml
+
+server-url: http://localhost:8081
+  # realm: manag3d
+  # client-id: manag3d-backend
+  # client-secret: AlqnKQYFiYr5iGYrWXYVD8G1LCeML52J
+  # sync-minutes: 10
+  # sync-failure-retries: 5
+
+ecis:
+  login:
+    enableAttemptProtection: true
+    enablePasswordExpiration: true
+    passwordExpirationTime: 90
+    maxAttempts: 5
+    blockTime: 300
+  jwt:
+    access:
+      secretKey: afdssiojsdaoziufhiufhisudkjhzsidukjkudszhfwiuzghwqiuwqkzdqw
+      validity: 900
+    refresh:
+      secretKey: afdssiojsdaoziufhiufhisudkjhzsidukjkudszhfwiuzghwqiuwqkzdqwsdadadadadsad
+      validity: 86400
+  audit:
+    defaultAuditor: SYSTEM
+
+password:
+  validityDays: 127

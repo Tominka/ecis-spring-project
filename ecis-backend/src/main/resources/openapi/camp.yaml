@@ -1,0 +1,321 @@
+openapi: 3.0.1
+info:
+  title: Camp API
+  description: API definiton for camps
+  version: 1.0.0
+tags:
+  -
+    name: Camp
+    description: APIs for managing camps in system
+servers:
+  - url: /api/v1
+    description: Local development server
+
+paths:
+  /camp:
+    get:
+      tags:
+        - Camp
+      operationId: getAllCamps
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Fetched camps
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CampDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+    post:
+      tags:
+        - Camp
+      operationId: createCamp
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CampDto"
+      responses:
+        "200":
+          description: Created new camp
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CampDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "422":
+          description: Dto validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+  /camp/lov:
+    get:
+      tags:
+        - Camp
+      operationId: getAllCampsLov
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Fetched camps in lov
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LovDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+  /camp/{id}:
+    get:
+      tags:
+        - Camp
+      operationId: getCampById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Camp updated by Id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CampDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "404":
+          description: Camp with given ID not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+    put:
+      tags:
+        - Camp
+      operationId: updateCampById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CampDto"
+      responses:
+        "200":
+          description: Fetched camp by Id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CampDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "404":
+          description: Camp with given ID not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "422":
+          description: Dto validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "429":
+          description: Record version violation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+components:
+  schemas:
+    CampDto:
+      type: object
+      required:
+        - name
+        - location
+        - price
+        - dateFrom
+        - enabled
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        location:
+          type: string
+        price:
+          type: number
+          format: double
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+        enabled:
+          type: boolean
+        archivedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedBy:
+          type: string
+        version:
+          type: integer
+          format: int32
+
+    LovDto:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+
+    ErrorDto:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+        timestamp:
+          type: string
+
+  parameters:
+    CampIdParam:
+      name: campId
+      description: Camp Id
+      schema:
+        format: int64
+        type: integer
+      in: path
+      required: true
+
+  securitySchemes:
+    campContext:
+      type: apiKey
+      in: header
+      name: X-Camp-Id
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,385 @@
+openapi: 3.0.1
+info:
+  title: Sec API
+  description: API definiton for sec
+  version: 1.0.0
+tags:
+  -
+    name: Security
+    description: APIs for managing system sec
+servers:
+  - url: /api/v1
+    description: Local development server
+
+paths:
+  /sec/login:
+    post:
+      tags:
+        - Security
+      operationId: login
+      requestBody:
+        description: User login credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequestDto"
+      responses:
+        "200":
+          description: Successfully logged in
+          content:
+            application/json:
+              schema:
+                  $ref: "#/components/schemas/LoginResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+  /sec/logout:
+    post:
+      tags:
+        - Security
+      summary: Logout current user
+      description: Succesfully logged out
+      operationId: logout
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: User session revoked successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+
+  /sec/creds:
+    get:
+      tags:
+        - Security
+      security:
+        - bearerAuth: []
+      operationId: getCredentials
+      responses:
+        "200":
+          description: Successfully logged in
+          content:
+            application/json:
+              schema:
+                  $ref: "#/components/schemas/UserCredentialsDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+  /sec/roles:
+    get:
+      tags:
+        - Security
+      security:
+        - bearerAuth: []
+        - campContext: []
+      operationId: getRoles
+      responses:
+        "200":
+          description: userRoles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+  /sec/2fa/qr:
+    get:
+      tags:
+        - Security
+      summary: Two factor QR code
+      description: Two factor QR code for authenticator,
+      operationId: getTwoFaQ
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TwoFaQrCodeDto"
+          description: Qr retrieved for user verification
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+  /sec/2fa/enable:
+    patch:
+      tags:
+        - Security
+      operationId: enableTwoFaQ
+      security:
+        - bearerAuth: []
+      summary: Two factor enable
+      description: Enable two-factor authentication (verify code)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TwoFaCodeDto"
+        required: true
+      responses:
+        "204":
+          description: Two factor verification enabled
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+  /sec/refresh:
+    post:
+      tags:
+        - Security
+      operationId: refreshToken
+      summary: Refresh access token
+      description: Refresh JWT access token using refresh token
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequestDto"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponseDto"
+          description: Token refreshed successfully
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+components:
+  schemas:
+    LoginRequestDto:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          maxLength: 255
+        password:
+          type: string
+          maxLength: 255
+        twoFaCode:
+          type: integer
+          format: int32
+    LoginResponseDto:
+      type: object
+      required:
+        - twoFaRequired
+      properties:
+        token:
+          type: string
+        refreshToken:
+          type: string
+        twoFaRequired:
+          type: boolean
+    UserCredentialsDto:
+      type: object
+      properties:
+        username:
+          type: string
+        fullname:
+          type: string
+        settings:
+          $ref: "#/components/schemas/UserSettingsDto"
+        isSystemAdmin:
+          type: boolean
+        is2FaEnabled:
+          type: boolean
+    UserSettingsDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        defaultPage:
+          type: string
+        defaultPageAfterLogin:
+          type: boolean
+        defaultPageAfterRefresh:
+          type: boolean
+        selectedCampId:
+          type: integer
+          format: int64
+    RefreshTokenRequestDto:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+    TwoFaQrCodeDto:
+      type: object
+      properties:
+        qrUrl:
+          type: string
+    TwoFaCodeDto:
+      type: object
+      properties:
+        twoFaCode:
+          type: integer
+          format: int32
+    ErrorDto:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+        timestamp:
+          type: string
+
+  parameters:
+    CampIdParam:
+      name: campId
+      description: Camp Id
+      schema:
+        format: int64
+        type: integer
+      in: path
+      required: true
+
+  securitySchemes:
+    campContext:
+      type: apiKey
+      in: header
+      name: X-Camp-Id
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

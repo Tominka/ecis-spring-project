@@ -1,4 +1,4 @@
-package cz.ecis.modules.sec.service;
+package cz.ecis.service;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -10,7 +10,7 @@ import cz.ecis.core.exception.AccountBlockedException;
 import cz.ecis.core.settings.EcisLoginSettings;
 import cz.ecis.db.ent.LoginAttemptEnt;
 import cz.ecis.db.repo.LoginAttemptRepository;
-import cz.ecis.modules.sec.mapper.LoginMapper;
+import cz.ecis.mapper.LoginMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 

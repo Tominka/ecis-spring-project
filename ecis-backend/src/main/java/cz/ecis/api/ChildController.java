@@ -1,4 +1,4 @@
-package cz.ecis.modules.child.api;
+package cz.ecis.api;
 
 
 import java.util.List;
@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RestController;
 import cz.ecis.core.model.LovDto;
 import cz.ecis.core.security.EcisRoleEnum;
 import cz.ecis.core.security.annotation.CampSecured;
-import cz.ecis.modules.child.model.ChildDto;
-import cz.ecis.modules.child.service.ChildService;
+import cz.ecis.model.dto.ChildDto;
+import cz.ecis.service.ChildService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("${openapi.ecis.base-path:/api/v1}")
 @RequiredArgsConstructor
-public class ChildController implements ChildApi {
+public class ChildController implements ChildApiInterface {
 
     private final ChildService childService;
 

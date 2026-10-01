@@ -1,4 +1,4 @@
-package cz.ecis.modules.sec.service;
+package cz.ecis.service;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -18,8 +18,8 @@ import cz.ecis.db.ent.UserEnt;
 import cz.ecis.db.repo.LogLoginRepository;
 import cz.ecis.db.repo.LoginAttemptRepository;
 import cz.ecis.db.repo.RefreshTokenRepository;
-import cz.ecis.modules.sec.mapper.LoginMapper;
-import cz.ecis.modules.sec.model.LoginResponseDto;
+import cz.ecis.mapper.LoginMapper;
+import cz.ecis.model.dto.LoginResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 

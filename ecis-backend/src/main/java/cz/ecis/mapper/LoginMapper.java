@@ -1,4 +1,4 @@
-package cz.ecis.modules.sec.mapper;
+package cz.ecis.mapper;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;

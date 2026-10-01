@@ -1,4 +1,4 @@
-package cz.ecis.modules.sec.mapper;
+package cz.ecis.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -6,8 +6,8 @@ import org.mapstruct.Mapping;
 import cz.ecis.config.mapper.DefaultMapperConfig;
 import cz.ecis.db.ent.UserEnt;
 import cz.ecis.db.ent.UserSettingsEnt;
-import cz.ecis.modules.sec.model.UserCredentialsDto;
-import cz.ecis.modules.sec.model.UserSettingsDto;
+import cz.ecis.model.dto.UserCredentialsDto;
+import cz.ecis.model.dto.UserSettingsDto;
 
 @Mapper(componentModel = "spring", config = DefaultMapperConfig.class)
 public interface SecMapper {

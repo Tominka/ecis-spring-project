@@ -1,4 +1,4 @@
-package cz.ecis.modules.child.service;
+package cz.ecis.service;
 
 import java.util.List;
 
@@ -11,10 +11,10 @@ import cz.ecis.core.security.CampSecurityContext;
 import cz.ecis.db.ent.CampEnt;
 import cz.ecis.db.repo.CampRepository;
 import cz.ecis.db.repo.ChildRepository;
-import cz.ecis.modules.camp.mapper.CampMapper;
-import cz.ecis.modules.camp.model.CampDto;
-import cz.ecis.modules.child.mapper.ChildMapper;
-import cz.ecis.modules.child.model.ChildDto;
+import cz.ecis.mapper.CampMapper;
+import cz.ecis.mapper.ChildMapper;
+import cz.ecis.model.dto.CampDto;
+import cz.ecis.model.dto.ChildDto;
 import cz.ecis.utils.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

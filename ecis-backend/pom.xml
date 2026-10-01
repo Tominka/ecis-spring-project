@@ -138,9 +138,9 @@
 						<configuration>
 							<inputSpec>${project.basedir}/src/main/resources/openapi/camp.yaml</inputSpec>
 							<generatorName>spring</generatorName>
-							<apiPackage>cz.ecis.modules.camp.api</apiPackage>
-							<modelPackage>cz.ecis.modules.camp.model</modelPackage>
-							<supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+							<apiPackage>cz.ecis.api</apiPackage>
+							<modelPackage>cz.ecis.model.dto</modelPackage>
+							<apiNameSuffix>ApiInterface</apiNameSuffix>
 							<importMappings>
 								LovDto=cz.ecis.core.model.LovDto,
 								ErrorDto=cz.ecis.core.model.ErrorDto
@@ -167,9 +167,9 @@
 						<configuration>
 							<inputSpec>${project.basedir}/src/main/resources/openapi/sec.yaml</inputSpec>
 							<generatorName>spring</generatorName>
-							<apiPackage>cz.ecis.modules.sec.api</apiPackage>
-							<modelPackage>cz.ecis.modules.sec.model</modelPackage>
-							<supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+							<apiPackage>cz.ecis.api</apiPackage>
+							<modelPackage>cz.ecis.model.dto</modelPackage>
+							<apiNameSuffix>ApiInterface</apiNameSuffix>
 							<importMappings>
 								LovDto=cz.ecis.core.model.LovDto,
 								ErrorDto=cz.ecis.core.model.ErrorDto
@@ -194,9 +194,9 @@
 						<configuration>
 							<inputSpec>${project.basedir}/src/main/resources/openapi/child.yaml</inputSpec>
 							<generatorName>spring</generatorName>
-							<apiPackage>cz.ecis.modules.child.api</apiPackage>
-							<modelPackage>cz.ecis.modules.child.model</modelPackage>
-							<supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+							<apiPackage>cz.ecis.api</apiPackage>
+							<modelPackage>cz.ecis.model.dto</modelPackage>
+							<apiNameSuffix>ApiInterface</apiNameSuffix>
 							<importMappings>
 								LovDto=cz.ecis.core.model.LovDto,
 								ErrorDto=cz.ecis.core.model.ErrorDto

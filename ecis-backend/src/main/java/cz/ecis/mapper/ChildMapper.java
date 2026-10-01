@@ -1,4 +1,4 @@
-package cz.ecis.modules.child.mapper;
+package cz.ecis.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -6,7 +6,7 @@ import org.mapstruct.MappingTarget;
 
 import cz.ecis.config.mapper.DefaultMapperConfig;
 import cz.ecis.db.ent.ChildEnt;
-import cz.ecis.modules.child.model.ChildDto;
+import cz.ecis.model.dto.ChildDto;
 
 @Mapper(componentModel = "spring", config = DefaultMapperConfig.class)
 public interface ChildMapper {

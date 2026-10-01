@@ -1,4 +1,4 @@
-package cz.ecis.modules.sec.service;
+package cz.ecis.service;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -32,13 +32,13 @@ import cz.ecis.db.ent.RefreshTokenEnt;
 import cz.ecis.db.ent.UserEnt;
 import cz.ecis.db.repo.RefreshTokenRepository;
 import cz.ecis.db.repo.UserRepository;
-import cz.ecis.modules.sec.mapper.SecMapper;
-import cz.ecis.modules.sec.model.LoginRequestDto;
-import cz.ecis.modules.sec.model.LoginResponseDto;
-import cz.ecis.modules.sec.model.RefreshTokenRequestDto;
-import cz.ecis.modules.sec.model.TwoFaCodeDto;
-import cz.ecis.modules.sec.model.TwoFaQrCodeDto;
-import cz.ecis.modules.sec.model.UserCredentialsDto;
+import cz.ecis.mapper.SecMapper;
+import cz.ecis.model.dto.LoginRequestDto;
+import cz.ecis.model.dto.LoginResponseDto;
+import cz.ecis.model.dto.RefreshTokenRequestDto;
+import cz.ecis.model.dto.TwoFaCodeDto;
+import cz.ecis.model.dto.TwoFaQrCodeDto;
+import cz.ecis.model.dto.UserCredentialsDto;
 import cz.ecis.utils.SecurityUtils;
 import dev.samstevens.totp.time.SystemTimeProvider;
 import jakarta.transaction.Transactional;

@@ -1,4 +1,4 @@
-package cz.ecis.modules.camp.mapper;
+package cz.ecis.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -6,7 +6,7 @@ import org.mapstruct.MappingTarget;
 
 import cz.ecis.config.mapper.DefaultMapperConfig;
 import cz.ecis.db.ent.CampEnt;
-import cz.ecis.modules.camp.model.CampDto;
+import cz.ecis.model.dto.CampDto;
 
 @Mapper(componentModel = "spring", config = DefaultMapperConfig.class)
 public interface CampMapper {

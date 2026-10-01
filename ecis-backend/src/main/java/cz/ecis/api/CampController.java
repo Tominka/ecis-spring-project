@@ -1,4 +1,4 @@
-package cz.ecis.modules.camp.api;
+package cz.ecis.api;
 
 
 import java.util.List;
@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cz.ecis.core.model.LovDto;
-import cz.ecis.modules.camp.model.CampDto;
-import cz.ecis.modules.camp.service.CampService;
+import cz.ecis.model.dto.CampDto;
+import cz.ecis.service.CampService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("${openapi.ecis.base-path:/api/v1}")
 @RequiredArgsConstructor
-public class CampController implements CampApi {
+public class CampController implements CampApiInterface {
 
     private final CampService campService;
 

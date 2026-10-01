@@ -1,4 +1,4 @@
-package cz.ecis.modules.sec.api;
+package cz.ecis.api;
 
 import java.util.List;
 
@@ -7,19 +7,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cz.ecis.core.security.annotation.CampSecured;
-import cz.ecis.modules.sec.model.LoginRequestDto;
-import cz.ecis.modules.sec.model.LoginResponseDto;
-import cz.ecis.modules.sec.model.RefreshTokenRequestDto;
-import cz.ecis.modules.sec.model.TwoFaCodeDto;
-import cz.ecis.modules.sec.model.TwoFaQrCodeDto;
-import cz.ecis.modules.sec.model.UserCredentialsDto;
-import cz.ecis.modules.sec.service.SecService;
+import cz.ecis.model.dto.LoginRequestDto;
+import cz.ecis.model.dto.LoginResponseDto;
+import cz.ecis.model.dto.RefreshTokenRequestDto;
+import cz.ecis.model.dto.TwoFaCodeDto;
+import cz.ecis.model.dto.TwoFaQrCodeDto;
+import cz.ecis.model.dto.UserCredentialsDto;
+import cz.ecis.service.SecService;
 import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("${openapi.ecis.base-path:/api/v1}")
-public class SecController implements SecApi {
+public class SecController implements SecApiInterface {
 
     private final SecService secService;
 

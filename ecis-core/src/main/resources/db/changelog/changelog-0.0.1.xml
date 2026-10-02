@@ -1190,4 +1190,27 @@
 
     </changeSet>
 
+    <changeSet id="17-fix-bad-application-camp-foreign-key" author="Tom">
+        <addForeignKeyConstraint
+            baseTableSchemaName="ecis"
+            baseTableName="application"
+            baseColumnNames="id_camp"
+            referencedTableSchemaName="ecis"
+            referencedTableName="camp"
+            referencedColumnNames="id"
+            constraintName="application_id_camp_fk"
+        />
+        <dropForeignKeyConstraint baseTableSchemaName="ecis" baseTableName="child" constraintName="application_id_camp_fk" />
+    </changeSet>
+
+    <changeSet id="17-grant-application-tables-permissions" author="Tom">
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT ON TABLE ecis.application TO ecis_apl;
+            GRANT SELECT, UPDATE, INSERT ON TABLE audit.application_history TO ecis_apl;
+
+            GRANT SELECT, UPDATE, INSERT ON TABLE ecis.application_parent TO ecis_apl;
+            GRANT SELECT, UPDATE, INSERT ON TABLE audit.application_parent_history TO ecis_apl;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

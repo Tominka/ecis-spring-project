@@ -26,7 +26,7 @@ public class ParentService {
     public List<ParentDto> getAll() {
         Long camp = CampSecurityContext.getCampId();
 
-        return this.parentRepository.findAllByCampId(camp).stream()
+        return this.parentRepository.findAllByApplicationsCampId(camp).stream()
             .map(this.parentMapper::toDto)
             .toList();
     }
@@ -34,7 +34,7 @@ public class ParentService {
     public List<LovDto> getAllLov() {
         Long camp = CampSecurityContext.getCampId();
 
-        return this.parentRepository.findAllByCampId(camp).stream()
+        return this.parentRepository.findAllByApplicationsCampId(camp).stream()
             .map(this.lovDtoMapper::toLovDto)
             .toList();
     }

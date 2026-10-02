@@ -1,6 +1,5 @@
 package cz.ecis.db.ent;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 import org.hibernate.envers.RevisionType;
@@ -19,10 +18,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(schema = "audit", name = "child_history")
+@Table(schema = "audit", name = "application_history")
 @Getter
 @Setter
-public class ChildHistoryEnt {
+public class ApplicationHistoryEnt {
 
     @EmbeddedId
     private EcisAuditId pk;
@@ -35,17 +34,11 @@ public class ChildHistoryEnt {
     @Enumerated(EnumType.ORDINAL)
     private RevisionType revisionType;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "confirmed_at")
+    private OffsetDateTime confirmedAt;
 
-    @Column(name = "surname")
-    private String surname;
-
-    @Column(name = "address")
-    private String address;
-
-    @Column(name = "birthdate")
-    private LocalDate birthdate;
+    @Column(name = "canceled_at")
+    private OffsetDateTime canceledAt;
 
     @Column(name = "created_at")
     private OffsetDateTime createdAt;
@@ -61,4 +54,5 @@ public class ChildHistoryEnt {
 
     @Column(name = "version")
     private Integer version;
+
 }

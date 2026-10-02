@@ -63,18 +63,33 @@ public class CrudUtils {
             return;
         }
 
-        if (ent.getCamp() == null || ent.getCamp().getId() == null) {
-            LOGGER.warn(
-                String.format("Record %s has no camp assigned or camp id is not defined (is null). Permission denied for obtain", ent.getClass())
-            );
+        Long entCampId = ent.getCamp() == null ? null : ent.getCamp().getId();
+
+        CrudUtils.checkEntityCamp(entCampId, campId, ICampEntity.class);
+    }
+
+    public static void checkEntityCamp(Long entCampId, Long campId, Class<?> entClazz) {
+        if (entCampId == null || campId == null) {
+            LOGGER.warn("Record %s has no camp assigned or camp id is not defined (is null). Permission denied for obtain", entClazz.getName());
             throw new EntityNotExistsException("Record not found", null);
         }
 
-        if (!ent.getCamp().getId().equals(campId)) {
-            LOGGER.warn(
-                String.format("Record %s has incorrect camp check. {record_camp=%s;requested_camp=%s}. Permission denied for obtain", ent.getClass(), ent.getCamp().getId(), campId)
-            );
-            throw new EntityNotExistsException("Record not found", null);
+        if (!entCampId.equals(campId)) {
+            CrudUtils.handleCampsNotEquals(entCampId, campId, entClazz);
         }
+    }
+
+    public static void handleCampsNotEquals(Long entCampId, Long campId, Class<?> entClazz) {
+        LOGGER.warn(
+            String.format("Record %s has incorrect camp check. {record_camp=%s;requested_camp=%s}. Permission denied for obtain", entClazz.getClass(), entCampId, campId)
+        );
+        throw new EntityNotExistsException("Record not found", null);
+    }
+
+     public static void handleEntityNotFoundInCamp(Long campId, Class<?> entClazz) {
+        LOGGER.warn(
+            String.format("Camp check failed. Record %s has not found in camp {requested_camp=%s}. Permission denied for obtain", entClazz.getClass(), campId)
+        );
+        throw new EntityNotExistsException("Record not found", null);
     }
 }

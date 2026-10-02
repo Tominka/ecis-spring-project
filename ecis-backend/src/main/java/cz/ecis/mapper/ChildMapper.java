@@ -14,10 +14,7 @@ public interface ChildMapper {
     public ChildDto toDto(ChildEnt ent);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "camp", ignore = true)
     @Mapping(target = "info", ignore = true)
-    @Mapping(target = "confirmedAt", ignore = true)
-    @Mapping(target = "canceledAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
@@ -26,10 +23,7 @@ public interface ChildMapper {
     public void update(@MappingTarget ChildEnt ent, ChildDto dto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "camp", ignore = true)
     @Mapping(target = "info", ignore = true)
-    @Mapping(target = "confirmedAt", ignore = true)
-    @Mapping(target = "canceledAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

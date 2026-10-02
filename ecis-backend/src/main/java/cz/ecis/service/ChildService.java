@@ -30,7 +30,7 @@ public class ChildService {
     public List<ChildDto> getAll() {
         Long camp = CampSecurityContext.getCampId();
 
-        return this.childRepository.findAllByCampId(camp).stream()
+        return this.childRepository.findAllByApplicationsCampId(camp).stream()
             .map(this.childMapper::toDto)
             .toList();
     }
@@ -38,7 +38,7 @@ public class ChildService {
     public List<LovDto> getAllLov() {
         Long camp = CampSecurityContext.getCampId();
 
-        return this.childRepository.findAllByCampId(camp).stream()
+        return this.childRepository.findAllByApplicationsCampId(camp).stream()
             .map(this.lovDtoMapper::toLovDto)
             .toList();
     }

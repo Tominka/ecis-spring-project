@@ -106,12 +106,6 @@ components:
         birthdate:
           type: string
           format: date
-        confirmedAt:
-          type: string
-          format: date-time
-        canceledAt:
-          type: string
-          format: date-time
         createdAt:
           type: string
           format: date-time

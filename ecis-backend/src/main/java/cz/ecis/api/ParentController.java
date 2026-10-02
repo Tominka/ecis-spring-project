@@ -22,13 +22,13 @@ public class ParentController implements ParentApiInterface {
     private final ParentService parentService;
 
     @Override
-    // @CampSecured(roles = {EcisRoleEnum.PARENTS_READ})
+    @CampSecured //(roles = {EcisRoleEnum.PARENTS_READ})
     public ResponseEntity<List<ParentDto>> getAllParents() {
         return ResponseEntity.ok(this.parentService.getAll());
     }
 
     @Override
-    // @CampSecured(roles = {EcisRoleEnum.PARENTS_READ})
+    @CampSecured //(roles = {EcisRoleEnum.PARENTS_READ})
     public ResponseEntity<List<LovDto>> getAllParentsLov() {
         return ResponseEntity.ok(this.parentService.getAllLov());
     }

@@ -4,20 +4,21 @@ import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.MappingConstants.ComponentModel;
 
 import cz.ecis.core.ent.lookup.EcisLookupEntity;
 import cz.ecis.core.ent.lookup.EcisLookupTranslation;
 import cz.ecis.core.model.LovDto;
 import cz.ecis.localization.EcisLocaleContext;
 
-@Mapper(componentModel = "spring")
-public abstract class LookupBaseMapper {
+@Mapper(componentModel = ComponentModel.SPRING)
+public interface LookupBaseMapper {
 
     @Mapping(target = "label", ignore = true)
     abstract LovDto toLovDto(EcisLookupEntity<Long> ent);
 
     @AfterMapping
-    void afterLookupBaseMapping(@MappingTarget LovDto dto, EcisLookupEntity<Long> ent) {
+    default void afterLookupBaseMapping(@MappingTarget LovDto dto, EcisLookupEntity<Long> ent) {
         dto.setLabel(getLovMappingLabel(ent));
     }
 

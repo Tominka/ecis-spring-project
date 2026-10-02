@@ -12,7 +12,7 @@ servers:
     description: Local development server
 
 paths:
-  /child-info:
+  /lookup/child-info:
     get:
       tags:
         - Lookup
@@ -47,7 +47,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorDto"
 
-  /child-info/lov:
+  /lookup/child-info/lov:
     get:
       tags:
         - Lookup

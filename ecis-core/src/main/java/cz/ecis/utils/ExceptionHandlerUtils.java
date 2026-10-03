@@ -9,9 +9,9 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
-import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 
 import cz.ecis.core.model.ErrorDto;
+import tools.jackson.core.JacksonException.Reference;
 
 public class ExceptionHandlerUtils {
 
@@ -30,7 +30,7 @@ public class ExceptionHandlerUtils {
     }
 
     public static String getFieldName(List<Reference> pathList) {
-        return pathList.isEmpty() ? "unknown" : pathList.get(0).getFieldName();
+        return pathList.isEmpty() ? "unknown" : pathList.get(0).getPropertyName();
     }
 
     public static ErrorDto handleError(HttpStatus status, Throwable e) {

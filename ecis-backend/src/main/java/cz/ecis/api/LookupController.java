@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("${openapi.ecis.base-path:/api/v1}")
 @RequiredArgsConstructor
-public class LkpChildInfoController implements ChildInfoApiInterface {
+public class LookupController implements LookupApiInterface {
     
     private final LkpChildInfoService lkpChildInfoService;
 

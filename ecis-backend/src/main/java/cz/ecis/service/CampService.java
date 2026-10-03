@@ -10,7 +10,7 @@ import cz.ecis.core.exception.IllegalRecordStateException;
 import cz.ecis.core.mapper.LovDtoMapper;
 import cz.ecis.core.model.LovDto;
 import cz.ecis.db.ent.CampEnt;
-import cz.ecis.db.repo.CampRepository;
+import cz.ecis.db.repo.CampBaseRepository;
 import cz.ecis.mapper.CampMapper;
 import cz.ecis.model.dto.CampDto;
 import cz.ecis.utils.SecurityUtils;
@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CampService {
 
-    private final CampRepository campRepository;
+    private final CampBaseRepository campRepository;
     private final CampMapper campMapper;
     private final LovDtoMapper lovDtoMapper;
 

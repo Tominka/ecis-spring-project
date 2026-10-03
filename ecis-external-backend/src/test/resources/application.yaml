@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: ECIS backend
+  profiles:
+    active: test
+  datasource:
+    jdbc-url: jdbc:postgresql://localhost:15432/ecis
+    username: ecis_apl
+    password: ecis_apl
+    driver-class-name: org.postgresql.Driver
+  
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/changelog-master.xml
+    liquibaseSchema: public
+    url: jdbc:postgresql://localhost:15432/ecis
+    user: ecis
+    password: ecis
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+    show-sql: false
+  main:
+    log-startup-info: true
+server:
+  port: 8082
+
+# liquibase:
+#   changelog: classpath:db/changelog/changelog-master.xml
+#   enabled: false
+#   context: null
+
+
+server-url: http://localhost:8082
+
+ecis:
+  login:
+    enableAttemptProtection: true
+    enablePasswordExpiration: true
+    passwordExpirationTime: 90
+    maxAttempts: 5
+    blockTime: 300
+  jwt:
+    access:
+      secretKey: afdssiojsdaoziufhiufhisudkjhzsidukjkudszhfwiuzghwqiuwqkzdqw
+      validity: 900
+    refresh:
+      secretKey: afdssiojsdaoziufhiufhisudkjhzsidukjkudszhfwiuzghwqiuwqkzdqwsdadadadadsad
+      validity: 86400
+  audit:
+    defaultAuditor: SYSTEM
+
+password:
+  validityDays: 127

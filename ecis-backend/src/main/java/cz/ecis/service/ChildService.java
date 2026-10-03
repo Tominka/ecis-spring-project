@@ -9,7 +9,7 @@ import cz.ecis.core.mapper.LovDtoMapper;
 import cz.ecis.core.model.LovDto;
 import cz.ecis.core.security.CampSecurityContext;
 import cz.ecis.db.ent.CampEnt;
-import cz.ecis.db.repo.CampRepository;
+import cz.ecis.db.repo.CampBaseRepository;
 import cz.ecis.db.repo.ChildRepository;
 import cz.ecis.mapper.CampMapper;
 import cz.ecis.mapper.ChildMapper;

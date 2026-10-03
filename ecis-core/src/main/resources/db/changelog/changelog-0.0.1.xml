@@ -1213,4 +1213,105 @@
         </sql>
     </changeSet>
 
+    <changeSet id="18-drop-not-used-table" author="">
+        <dropTable schemaName="audit" tableName="child_parent_history" />
+    </changeSet>
+
+    <changeSet id="18-grants-to-external-user" author="Tom">
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT USAGE ON SCHEMA ecis TO ecis_ext_apl;
+            GRANT USAGE ON SCHEMA security TO ecis_ext_apl;
+            GRANT USAGE ON SCHEMA audit TO ecis_ext_apl;
+            GRANT USAGE ON SCHEMA lookup TO ecis_ext_apl;
+            GRANT USAGE ON SCHEMA log TO ecis_ext_apl;
+
+            GRANT SELECT, INSERT ON TABLE audit.application_history TO ecis_ext_apl;
+            GRANT SELECT, INSERT ON TABLE audit.application_parent_history TO ecis_ext_apl;
+            GRANT SELECT, INSERT ON TABLE audit.child_history TO ecis_ext_apl;
+            GRANT SELECT, INSERT ON TABLE audit.child_info_history TO ecis_ext_apl;
+            GRANT SELECT, INSERT ON TABLE audit.parent_history TO ecis_ext_apl;
+            GRANT SELECT, INSERT ON TABLE audit.revision TO ecis_ext_apl;
+
+            GRANT SELECT, INSERT, UPDATE ON TABLE ecis.application TO ecis_ext_apl;
+            GRANT SELECT, INSERT, UPDATE ON TABLE ecis.application_parent TO ecis_ext_apl;
+            GRANT SELECT ON TABLE ecis.camp TO ecis_ext_apl;
+            GRANT SELECT, INSERT, UPDATE ON TABLE ecis.child TO ecis_ext_apl;
+            GRANT SELECT, INSERT, UPDATE ON TABLE ecis.child_info TO ecis_ext_apl;
+            GRANT SELECT ON TABLE lookup.lkp_child_info TO ecis_ext_apl; 
+        </sql>
+    </changeSet>
+
+    <changeSet id="18-added-api-key-tables" author="Tom">
+        <createTable schemaName="security" tableName="api_key">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="key_hash" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable schemaName="log" tableName="api_key_entry">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="id_api_key" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="endpoint" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ip_address" type="VARCHAR(45)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="user_agent" type="VARCHAR(512)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="payload_length" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="success" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, INSERT ON TABLE security.api_key TO ecis_ext_apl;
+            GRANT SELECT, INSERT ON TABLE log.api_key_entry TO ecis_ext_apl; 
+        </sql>
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="log"
+            baseTableName="api_key_entry"
+            baseColumnNames="id_api_key"
+            referencedTableSchemaName="security"
+            referencedTableName="api_key"
+            referencedColumnNames="id"
+            constraintName="api_key_entry_id_api_key_fk"
+        />
+
+    </changeSet>
+
 </databaseChangeLog>

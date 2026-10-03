@@ -15,6 +15,7 @@
 
 	<modules>
 		<module>ecis-backend</module>
+		<module>ecis-external-backend</module>
 		<module>ecis-core</module>
 	</modules>
 
@@ -70,9 +71,10 @@
 			</dependency>
 
 			<dependency>
-				<groupId>com.fasterxml.jackson.datatype</groupId>
-				<artifactId>jackson-datatype-jsr310</artifactId>
-				<version>2.22.3</version>
+				<groupId>tools.jackson.module</groupId>
+				<artifactId>jackson-module-afterburner</artifactId>
+				<version>3.2.3</version>
+				<scope>compile</scope>
 			</dependency>
 
 			<dependency>
@@ -85,6 +87,12 @@
 				<artifactId>mapstruct-processor</artifactId>
 				<version>${mapstruct.version}</version>
 				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>1.18.46</version>
 			</dependency>
 
 			<dependency>
@@ -108,6 +116,12 @@
 			</dependency>
 
 			<dependency>
+				<groupId>dev.samstevens.totp</groupId>
+				<artifactId>totp</artifactId>
+				<version>1.7.1</version>
+			</dependency>
+
+			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-liquibase</artifactId>
 				<version>4.1.1</version>
@@ -124,6 +138,51 @@
 				<artifactId>postgresql</artifactId>
 				<version>42.7.13</version>
 				<scope>runtime</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-test</artifactId>
+				<version>4.1.1</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-devtools</artifactId>
+				<version>4.1.1</version>
+				<scope>runtime</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-test</artifactId>
+				<version>4.1.1</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-test</artifactId>
+				<version>7.1.1</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.assertj</groupId>
+				<artifactId>assertj-core</artifactId>
+				<version>3.27.7</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>1.19.3</version>
+				<scope>test</scope>
 			</dependency>
 
 		</dependencies>
@@ -170,6 +229,11 @@
 							</path>
 						</annotationProcessorPaths>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.openapitools</groupId>
+					<artifactId>openapi-generator-maven-plugin</artifactId>
+					<version>7.23.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>

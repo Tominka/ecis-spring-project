@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: ECIS external backend
+  profiles:
+    active: dev
+  datasource:
+    jdbc-url: jdbc:postgresql://localhost:5432/ecis
+    username: ecis_ext_apl
+    password: ecis_ext_apl
+    driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/changelog-master.xml
+    liquibaseSchema: public
+    url: jdbc:postgresql://localhost:5432/ecis
+    user: ecis
+    password: ecis
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+    show-sql: true
+  main:
+    log-startup-info: true
+server:
+  port: 8083
+
+springdoc:
+  api-docs:
+    enabled: true
+  # swagger-ui:
+  #   enabled: true
+
+# logging.level.org.springframework.security.authorization=TRACE
+# logging.level.org.springframework.security.web.access=TRACE
+# spring.jpa.properties.hibernate.format_sql=true
+# spring.jpa.show-sql=true
+
+ecis:
+  audit:
+    defaultAuditor: SYSTEM

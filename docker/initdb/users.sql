@@ -1,1 +1,0 @@
-CREATE ROLE ecis_apl WITH LOGIN PASSWORD 'ecis_apl';

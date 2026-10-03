@@ -7,18 +7,15 @@ import java.util.Map;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import cz.ecis.core.ent.VersionAwareEntity;
 import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @EqualsAndHashCode(doNotUseGetters = true, callSuper = false)

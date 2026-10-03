@@ -1,3 +1,10 @@
+server:
+  port: 8082
+  tomcat:
+    threads:
+      max: 60
+      min-spare: 5
+
 spring:
   application:
     name: ECIS backend
@@ -8,6 +15,26 @@ spring:
     username: ecis_apl
     password: ecis_apl
     driver-class-name: org.postgresql.Driver
+  hikari:
+    maximum-pool-size: 10
+    minimum-idle: 3
+    connection-timeout: 20000
+    idle-timeout: 300000
+  task:
+    execution:
+      pool:
+        core-size: 4
+        max-size: 8
+        queue-capacity: 100
+  threads:
+    virtual:
+      enabled: true
+  quartz:
+    properties:
+      org:
+        quartz:
+          threadPool:
+            threadCount: 5
   
   liquibase:
     enabled: true
@@ -26,8 +53,7 @@ spring:
     show-sql: true
   main:
     log-startup-info: true
-server:
-  port: 8082
+
   # servlet:
   #   context-path: /api/v1
   # compression:

@@ -24,7 +24,7 @@ import cz.ecis.core.security.EcisRoleEnum;
 import cz.ecis.core.security.EcisUserDetails;
 import cz.ecis.db.ent.CampEnt;
 import cz.ecis.db.ent.UserEnt;
-import cz.ecis.db.repo.CampRepository;
+import cz.ecis.db.repo.CampBaseRepository;
 import cz.ecis.db.repo.CampRoleRepository;
 import cz.ecis.utils.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,7 +40,7 @@ public class CampInterceptor implements HandlerInterceptor {
     public static final Logger LOGGER = LogManager.getLogger(CampInterceptor.class);
 
     private final CampRoleRepository campRoleRepository;
-    private final CampRepository campRepository;
+    private final CampBaseRepository campRepository;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {

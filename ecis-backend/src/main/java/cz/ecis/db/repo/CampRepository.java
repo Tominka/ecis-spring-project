@@ -2,13 +2,10 @@ package cz.ecis.db.repo;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
-
-import cz.ecis.core.repo.VersionAwareRepository;
 import cz.ecis.db.ent.CampEnt;
 
-public interface CampRepository extends VersionAwareRepository<CampEnt, Long> {
 
-    boolean existsById(Long campId);
+public interface CampRepository extends CampBaseRepository {
 
     @Query("""
         SELECT DISTINCT c FROM CampEnt c

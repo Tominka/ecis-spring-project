@@ -24,8 +24,7 @@ public class AuditorConfig {
 	        public String resolveUsername() {
 	            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-	            if (auth != null && auth.isAuthenticated()
-	                    && !(auth instanceof AnonymousAuthenticationToken)) {
+	            if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
 	                return auth.getName();
 	            }
 
@@ -34,7 +33,7 @@ public class AuditorConfig {
 	        
 	        @Override
 	        public String resolveApplication() {
-	            return "APP";
+	            return "APP-EXT";
 	        }
 
 	    };

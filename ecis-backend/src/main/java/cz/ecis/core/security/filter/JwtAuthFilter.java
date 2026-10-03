@@ -75,9 +75,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 EcisUserDetails details = (EcisUserDetails) authResult.getPrincipal();
 
-                if (details != null && details.getEnt() != null && !details.getEnt().getPasswordChanged()
+                if (details != null && details.getEnt() != null && !details.getEnt().getPasswordChanged().withNano(0)
                         .equals(jwtService.extractPasswordChanged(jwtClaims))) {
                     loginExceptionHandler.commence(request, response, new CredentialsExpiredException("Relace je neplatná"));
+                    return;
                 }
 
                 EcisContext.getRequest().getEntry().setAuthenticated(true);

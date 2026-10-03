@@ -7,12 +7,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import cz.ecis.db.ent.CampEnt;
+import cz.ecis.db.ent.CampRoleEnt;
 import cz.ecis.db.ent.RoleEnt;
 import cz.ecis.db.ent.UserEnt;
 import cz.ecis.db.repo.CampRepository;
 import cz.ecis.db.repo.CampRoleRepository;
 import cz.ecis.db.repo.RoleRepository;
 import cz.ecis.db.repo.UserRepository;
+import cz.ecis.utils.SecurityUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -51,5 +54,16 @@ public class EcisUserDetailsService implements UserDetailsService {
         }
 
         return new EcisUserDetails(user, roles, camps);
+    }
+
+    @Transactional
+    public CampRoleEnt assignUserToCamp(CampEnt camp) {
+        RoleEnt role = this.roleRepository.findByCodeAndEnabledTrue(EcisRoleEnum.USER.getCode());
+        CampRoleEnt ent = new CampRoleEnt();
+        ent.setUser(SecurityUtils.getUserEnt());
+        ent.setCamp(camp);
+        ent.setRole(role);
+
+        return this.campRoleRepository.save(ent);
     }
 }

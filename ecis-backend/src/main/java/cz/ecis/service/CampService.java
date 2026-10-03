@@ -4,15 +4,16 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import cz.ecis.utils.CrudUtils;
 import cz.ecis.core.exception.EntityNotExistsException;
 import cz.ecis.core.exception.IllegalRecordStateException;
 import cz.ecis.core.mapper.LovDtoMapper;
 import cz.ecis.core.model.LovDto;
+import cz.ecis.core.security.EcisUserDetailsService;
 import cz.ecis.db.ent.CampEnt;
-import cz.ecis.db.repo.CampBaseRepository;
+import cz.ecis.db.repo.CampRepository;
 import cz.ecis.mapper.CampMapper;
 import cz.ecis.model.dto.CampDto;
+import cz.ecis.utils.CrudUtils;
 import cz.ecis.utils.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CampService {
 
-    private final CampBaseRepository campRepository;
+    private final CampRepository campRepository;
     private final CampMapper campMapper;
     private final LovDtoMapper lovDtoMapper;
+
+    private final EcisUserDetailsService ecisUserDetailsService;
 
     public List<CampDto> getAll() {
         return SecurityUtils.getUserCamps().stream()
@@ -42,9 +45,11 @@ public class CampService {
             throw new IllegalRecordStateException("Dto check failed", "Date from must be before or equals to date to");
         }
 
-        return this.campMapper.toDto(
-            this.createCamp(dto)
-        );
+        CampEnt camp = this.createCamp(dto);
+
+        this.ecisUserDetailsService.assignUserToCamp(camp);
+
+        return this.campMapper.toDto(camp);
     }
 
     public CampDto updateById(Long id, CampDto dto) {

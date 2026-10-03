@@ -20,14 +20,14 @@ public class CampRoleEnt extends VersionAwareEntity<Long> {
     private static final long serialVersionUID = -1L;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user", referencedColumnName = "id", updatable = false, insertable = false)
+    @JoinColumn(name = "id_user", referencedColumnName = "id", updatable = false, insertable = true)
     private UserEnt user;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_role", referencedColumnName = "id", updatable = false, insertable = false)
+    @JoinColumn(name = "id_role", referencedColumnName = "id", updatable = false, insertable = true)
     private RoleEnt role;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_camp", referencedColumnName = "id", updatable = false, insertable = false)
+    @JoinColumn(name = "id_camp", referencedColumnName = "id", updatable = false, insertable = true)
     private CampEnt camp;
 }

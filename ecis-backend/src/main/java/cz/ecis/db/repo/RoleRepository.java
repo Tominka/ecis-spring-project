@@ -12,4 +12,6 @@ public interface RoleRepository extends JpaRepository<RoleEnt, Long> {
 
     List<RoleEnt> findAllByGlobalFalseAndEnabledTrue();
 
+    RoleEnt findByCodeAndEnabledTrue(String code);
+
 }

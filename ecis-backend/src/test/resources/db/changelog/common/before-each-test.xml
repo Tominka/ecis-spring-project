@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd"
+    logicalFilePath="test-camp.xml"
+>
+
+    <changeSet id="${test.uuid}-camp-test-data" author="Tom">
+        <insert schemaName="ecis" tableName="camp">
+            <column name="id" valueNumeric="1" />
+            <column name="name" value="Letní dobrodružství v lese" />
+            <column name="location" value="Šumava - Modrava" />
+            <column name="price" valueNumeric="4500" />
+            <column name="date_from" value="2026-07-05" />
+            <column name="date_to" value="2026-07-12" />
+            <column name="enabled" valueBoolean="true" />
+            <column name="created_by" valueBoolean="SYSTEM" />
+        </insert>
+        <insert schemaName="ecis" tableName="camp">
+            <column name="id" valueNumeric="2" />
+            <column name="name" value="Expedice za pokladem" />
+            <column name="location" value="Rabštejn nad Střelou" />
+            <column name="price" valueNumeric="5200" />
+            <column name="date_from" value="2026-07-13" />
+            <column name="date_to" value="2026-07-20" />
+            <column name="enabled" valueBoolean="true" />
+            <column name="created_by" valueBoolean="SYSTEM" />
+        </insert>
+        <insert schemaName="ecis" tableName="camp">
+            <column name="id" valueNumeric="3" />
+            <column name="name" value="Mladí rytíři a princezny" />
+            <column name="location" value="Zbiroh - Plzeňsko" />
+            <column name="price" valueNumeric="4800" />
+            <column name="date_from" value="2026-08-01" />
+            <column name="date_to" value="2026-08-08" />
+            <column name="enabled" valueBoolean="true" />
+            <column name="created_by" valueBoolean="SYSTEM" />
+        </insert>
+        <insert schemaName="ecis" tableName="camp">
+            <column name="id" valueNumeric="4" />
+            <column name="name" value="Sportovní tábor 2026" />
+            <column name="location" value="Třemošná u Plzně" />
+            <column name="price" valueNumeric="3900" />
+            <column name="date_from" value="2026-07-20" />
+            <column name="date_to" value="2026-07-27" />
+            <column name="enabled" valueBoolean="true" />
+            <column name="created_by" valueBoolean="SYSTEM" />
+        </insert>
+        <insert schemaName="ecis" tableName="camp">
+            <column name="id" valueNumeric="9999999" />
+            <column name="name" value="Admin tábor" />
+            <column name="location" value="Fiktivní" />
+            <column name="price" valueNumeric="99999" />
+            <column name="date_from" value="2026-07-20" />
+            <column name="date_to" value="2032-07-27" />
+            <column name="enabled" valueBoolean="true" />
+            <column name="created_by" valueBoolean="SYSTEM" />
+        </insert>
+    </changeSet>
+
+    <changeSet id="${test.uuid}-camp-test-sequence" author="Tom">
+        <sql>
+            SELECT setval(
+                pg_get_serial_sequence('ecis.camp', 'id'),
+                COALESCE((SELECT MAX(id) FROM ecis.camp), 1)
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="${test.uuid}-user-test-data-1" author="Tom">
+         <insert schemaName="security" tableName="user_settings">
+            <column name="id" valueNumeric="1" />
+            <column name="default_page" value="/" />
+            <column name="default_page_after_login" valueBoolean="false" />
+            <column name="default_page_after_refresh" valueBoolean="false" />
+            <column name="id_camp" value="1" />
+            <column name="auto_filter_by_selected_encampment" valueBoolean="false" />
+            <column name="created_by" valueBoolean="SYSTEM" />
+        </insert>
+        <insert schemaName="security" tableName="user">
+            <column name="id" valueNumeric="1" />
+            <column name="username" value="test" />
+            <column name="name" value="Tester" />
+            <column name="surname" value="Bobo" />
+            <column name="email" value="tester@bobovic.example" />
+            <column name="password" value="$2y$10$dYyDbwclslJPdLOCLom84u83g32.H.cygE6kIRYWMIMJYASbNM8oG" />
+            <column name="system_admin" valueBoolean="false" />
+            <column name="password_changed" valueComputed="current_timestamp - interval '1 day'" />
+            <column name="id_user_settings" valueNumeric="1" />
+            <column name="enabled" valueBoolean="true" />
+            <column name="2fa_secret" valueBoolean="false" />
+            <column name="created_by" valueBoolean="SYSTEM" />
+        </insert>
+        <insert schemaName="security" tableName="camp_role">
+            <column name="id" valueNumeric="1" />
+            <column name="id_user" valueNumeric="1" />
+            <column name="id_role" valueNumeric="1" />
+            <column name="id_camp" valueNumeric="1" />
+            <column name="created_by" valueBoolean="SYSTEM" />
+        </insert>
+        <insert schemaName="security" tableName="camp_role">
+            <column name="id" valueNumeric="2" />
+            <column name="id_user" valueNumeric="1" />
+            <column name="id_role" valueNumeric="4" />
+            <column name="created_by" valueBoolean="SYSTEM" />
+        </insert>
+        <insert schemaName="security" tableName="camp_role">
+            <column name="id" valueNumeric="3" />
+            <column name="id_user" valueNumeric="1" />
+            <column name="id_role" valueNumeric="5" />
+            <column name="created_by" valueBoolean="SYSTEM" />
+        </insert>
+    </changeSet>
+
+     <changeSet id="${test.uuid}-camp-role-test-sequence" author="Tom">
+        <sql>
+            SELECT setval(
+                pg_get_serial_sequence('security.camp_role', 'id'),
+                COALESCE((SELECT MAX(id) FROM security.camp_role), 1)
+            );
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

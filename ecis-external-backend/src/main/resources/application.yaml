@@ -8,16 +8,13 @@ spring:
     username: ecis_ext_apl
     password: ecis_ext_apl
     driver-class-name: org.postgresql.Driver
-
   liquibase:
     enabled: true
-    change-log: classpath:db/changelog/changelog-master.xml
     liquibaseSchema: public
-    url: jdbc:postgresql://localhost:5432/ecis
-    user: ecis
+    jdbc-url: jdbc:postgresql://localhost:5432/ecis
+    username: ecis
     password: ecis
     driver-class-name: org.postgresql.Driver
-
   jpa:
     open-in-view: false
     properties:

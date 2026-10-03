@@ -15,6 +15,13 @@ spring:
     username: ecis_apl
     password: ecis_apl
     driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    liquibaseSchema: public
+    jdbc-url: jdbc:postgresql://localhost:5432/ecis
+    username: ecis
+    password: ecis
+    driver-class-name: org.postgresql.Driver
   hikari:
     maximum-pool-size: 10
     minimum-idle: 3
@@ -35,15 +42,6 @@ spring:
         quartz:
           threadPool:
             threadCount: 5
-  
-  liquibase:
-    enabled: true
-    change-log: classpath:db/changelog/changelog-master.xml
-    liquibaseSchema: public
-    url: jdbc:postgresql://localhost:5432/ecis
-    user: ecis
-    password: ecis
-    driver-class-name: org.postgresql.Driver
 
   jpa:
     open-in-view: false

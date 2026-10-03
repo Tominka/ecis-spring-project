@@ -8,36 +8,30 @@ spring:
     username: ecis_apl
     password: ecis_apl
     driver-class-name: org.postgresql.Driver
-  
+    
   liquibase:
     enabled: true
-    change-log: classpath:db/changelog/changelog-master.xml
-    liquibaseSchema: public
-    url: jdbc:postgresql://localhost:15432/ecis
-    user: ecis
+    jdbc-url: jdbc:postgresql://localhost:15432/ecis
+    username: ecis
     password: ecis
     driver-class-name: org.postgresql.Driver
+    change-log: classpath:db/changelog/changelog-master.xml
+    liquibaseSchema: public
 
   jpa:
     open-in-view: false
     properties:
       hibernate:
         format_sql: false
-    show-sql: false
+    show-sql: true
   main:
     log-startup-info: true
 server:
   port: 8082
 
-# liquibase:
-#   changelog: classpath:db/changelog/changelog-master.xml
-#   enabled: false
-#   context: null
-
-
-server-url: http://localhost:8082
-
 ecis:
+  app:
+    displayAppName: TestApp
   login:
     enableAttemptProtection: true
     enablePasswordExpiration: true
@@ -56,3 +50,5 @@ ecis:
 
 password:
   validityDays: 127
+
+testing: true

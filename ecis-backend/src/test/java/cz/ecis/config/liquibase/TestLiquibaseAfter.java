@@ -1,4 +1,4 @@
-package cz.ecis.config;
+package cz.ecis.config.liquibase;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

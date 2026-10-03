@@ -21,6 +21,13 @@ public class SecurityUtils {
         /* This utility class should not be instantiated */
     }
 
+    public static boolean isAuthenticatedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        return auth != null && auth.isAuthenticated() && auth.getPrincipal() instanceof EcisUserDetails;
+    }
+
+
     public static UserEnt getUserEnt() {
         EcisUserDetails eud = getUserDetails();
         if (eud == null) {

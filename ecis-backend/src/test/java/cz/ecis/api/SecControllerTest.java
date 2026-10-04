@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import cz.ecis.config.EcisIntegrationTest;
+import cz.ecis.config.EcisIntegrationTestClient;
 import cz.ecis.model.dto.LoginRequestDto;
 import cz.ecis.model.dto.LoginResponseDto;
 import cz.ecis.model.dto.RefreshTokenRequestDto;
@@ -20,7 +20,7 @@ import dev.samstevens.totp.code.DefaultCodeGenerator;
 import dev.samstevens.totp.time.SystemTimeProvider;
 import tools.jackson.core.type.TypeReference;
 
-class SecControllerTest extends EcisIntegrationTest {
+class SecControllerTest extends EcisIntegrationTestClient {
 
     @Test
     @Order(1)

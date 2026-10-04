@@ -10,12 +10,12 @@ import java.util.List;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
-import cz.ecis.config.EcisIntegrationTest;
+import cz.ecis.config.EcisIntegrationTestClient;
 import cz.ecis.core.model.LovDto;
 import cz.ecis.model.dto.CampDto;
 import tools.jackson.core.type.TypeReference;
 
-class CampControllerTest extends EcisIntegrationTest {
+class CampControllerTest extends EcisIntegrationTestClient {
 
     List<CampDto> createdCamps = new ArrayList<>();
 

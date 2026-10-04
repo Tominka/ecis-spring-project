@@ -6,7 +6,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,13 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-import cz.ecis.EcisTestApplication;
-import cz.ecis.api.SecController;
-import cz.ecis.config.liquibase.LiquibaseTest;
-import cz.ecis.config.liquibase.TestLiquibaseAfter;
-import cz.ecis.config.liquibase.TestLiquibaseBefore;
-import cz.ecis.model.dto.LoginRequestDto;
-import cz.ecis.model.dto.LoginResponseDto;
+import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.ObjectMapper;
@@ -30,26 +23,25 @@ import tools.jackson.databind.ObjectMapper;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-@SpringBootTest(classes = {EcisTestApplication.class})
-@LiquibaseTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@TestLiquibaseBefore(changeLog = "db/changelog/common/before-each-test.xml", dataSourceId = "liquibaseDataSource")
-@TestLiquibaseAfter(changeLog = "db/changelog/common/after-each-test.xml", dataSourceId = "liquibaseDataSource")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestPropertySource(properties = {
     "test.uuid=${random.uuid}"
 })
 @AutoConfigureMockMvc
 public abstract class EcisIntegrationTest {
-
-    private static final String DEFAULT_API_ROUTE = "/api/v1";
     
     @Autowired
     protected MockMvc mockMvc;
+
+    @Autowired
+    protected ObjectMapper om;
 
     private Map<String, String> usersTokens = new HashMap<>();
 
@@ -61,19 +53,29 @@ public abstract class EcisIntegrationTest {
 
     private boolean expectedEmptyContent = false;
 
-    @Autowired
-    protected ObjectMapper om;
-
     protected String testUserToken = null;
+
+    abstract String getApiDefaultApiRoute();
+    
+    abstract List<EcistTestUserCredential> obtainUserCredetnials() throws Exception;
 
     @BeforeAll
     void beforeAllTests() throws Exception {
-        this.obtainUserToken("test", "test");
+        this.registerUserCredentials();
     }
 
     @AfterEach
     void afterEachTest() {
         this.urlParams.clear();
+    }
+
+    private void registerUserCredentials() throws Exception {
+        List<EcistTestUserCredential> credentials = this.obtainUserCredetnials();
+        if (credentials != null) {
+            for (EcistTestUserCredential credential : credentials) {
+                 this.usersTokens.put(credential.name(), credential.token());
+            }
+        }
     }
 
     public EcisIntegrationTest withHeader(String header, String value) {
@@ -99,13 +101,6 @@ public abstract class EcisIntegrationTest {
         this.expectedEmptyContent = true;
         this.withExpectedStatus(HttpStatus.NO_CONTENT);
         return this;
-    }
-
-    private void obtainUserToken(String username, String password) throws Exception {
-        LoginRequestDto dto = new LoginRequestDto(username, password);
-        LoginResponseDto response = this.runPost(SecController.PATH_LOGIN, null, dto, LoginResponseDto.class);
-
-        this.usersTokens.put(username, response.getToken());
     }
 
     public void addUrlParam(String key, Object value) {
@@ -152,7 +147,7 @@ public abstract class EcisIntegrationTest {
         return this.readResult(result, om.constructType(resultClass.getType()));
     }
 
-    private <T> T readResult(MvcResult result, JavaType resultType) throws Exception {
+    private <T> T readResult(MvcResult result, JavaType resultType) throws JacksonException, UnsupportedEncodingException {
         if (this.expectedEmptyContent) {
             this.expectedEmptyContent = false;
             return null;
@@ -211,7 +206,7 @@ public abstract class EcisIntegrationTest {
     }
 
     private MockHttpServletRequestBuilder resolveRequest(String path, EcisRequestMethod method) {
-        String finalPath = DEFAULT_API_ROUTE + this.resolveFinalPath(path);
+        String finalPath = this.getApiDefaultApiRoute() + this.resolveFinalPath(path);
         switch (method) {
             case GET:
                 return get(finalPath);
@@ -224,12 +219,14 @@ public abstract class EcisIntegrationTest {
             case DELETE:
                 return delete(finalPath);
             default:
-                return null;
+                return get(finalPath);
         }
     }
 
-    public static enum EcisRequestMethod {
+    public enum EcisRequestMethod {
         GET, POST, PUT, PATCH, DELETE;
     }
+
+    public static record EcistTestUserCredential(String name, String token) {}
     
 }

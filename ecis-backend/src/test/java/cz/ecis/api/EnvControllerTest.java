@@ -7,7 +7,7 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.annotation.Order;
 import org.springframework.test.context.TestConstructor;
 
-import cz.ecis.config.EcisIntegrationTest;
+import cz.ecis.config.EcisIntegrationTestClient;
 import cz.ecis.core.environment.EnvTypeEnum;
 import cz.ecis.model.dto.EnvDto;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import tools.jackson.core.type.TypeReference;
 
 @RequiredArgsConstructor 
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-class EnvControllerTest extends EcisIntegrationTest {
+class EnvControllerTest extends EcisIntegrationTestClient {
 
     private final BuildProperties buildProperties;
 

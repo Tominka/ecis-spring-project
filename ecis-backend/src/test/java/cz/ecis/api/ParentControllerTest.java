@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
-import cz.ecis.config.EcisIntegrationTest;
+import cz.ecis.config.EcisIntegrationTestClient;
 import cz.ecis.config.liquibase.TestLiquibaseAfter;
 import cz.ecis.config.liquibase.TestLiquibaseBefore;
 import cz.ecis.core.model.LovDto;
@@ -16,7 +16,7 @@ import tools.jackson.core.type.TypeReference;
 
 @TestLiquibaseBefore(changeLog = "db/changelog/test-child-parent-application.xml", dataSourceId = "liquibaseDataSource")
 @TestLiquibaseAfter(changeLog = "db/changelog/test-child-parent-application-cleanup.xml", dataSourceId = "liquibaseDataSource")
-class ParentControllerTest extends EcisIntegrationTest {
+class ParentControllerTest extends EcisIntegrationTestClient {
 
     @Test
     @Order(1)

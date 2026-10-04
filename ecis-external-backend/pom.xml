@@ -89,22 +89,20 @@
 				<artifactId>openapi-generator-maven-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>env</id>
+						<id>test</id>
 						<goals>
 							<goal>generate</goal>
 						</goals>
 						<configuration>
-							<inputSpec>${project.basedir}/src/main/resources/openapi/env.yaml</inputSpec>
+							<inputSpec>${project.basedir}/src/main/resources/openapi/test.yaml</inputSpec>
 							<generatorName>spring</generatorName>
 							<apiPackage>cz.ecis.api</apiPackage>
 							<modelPackage>cz.ecis.model.dto</modelPackage>
 							<apiNameSuffix>ApiInterface</apiNameSuffix>
 							<importMappings>
-								EnvTypeEnum=cz.ecis.core.environment.EnvTypeEnum,
 								ErrorDto=cz.ecis.core.model.ErrorDto
 							</importMappings>
 							<typeMappings>
-								EnvTypeEnum=cz.ecis.core.environment.EnvTypeEnum,
 								ErrorDto=cz.ecis.core.model.ErrorDto
 							</typeMappings>
 							<configOptions>

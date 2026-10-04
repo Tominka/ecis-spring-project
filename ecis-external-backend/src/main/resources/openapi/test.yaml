@@ -5,27 +5,27 @@ info:
   version: 1.0.0
 tags:
   -
-    name: Env
-    description: APIs for system environment
+    name: Test
+    description: APIs for test connection
 servers:
-  - url: /api/v1
+  - url: /api/ext/v1
     description: Local development server
 
 paths:
-  /env:
+  /test:
     get:
       tags:
-        - Env
-      operationId: getAppEnv
+        - Test
+      operationId: getTestResponse
       security:
         - apiKeyContext: []
       responses:
         "200":
-          description: Fetched app environment
+          description: getTestResponse
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EnvDto"
+                type: string
         "401":
           description: Unauthorized
           content:
@@ -40,24 +40,7 @@ paths:
                 $ref: "#/components/schemas/ErrorDto"
 
 components:
-  schemas:
-    EnvDto:
-      type: object
-      required:
-        - version
-        - type
-      properties:
-        version:
-          type: string
-        type:
-            $ref: "#/components/schemas/EnvTypeEnum"
-
-    EnvTypeEnum:
-      enum:
-        - DEV
-        - TEST
-        - PROD
-  
+  schemas:  
     ErrorDto:
       type: object
       properties:

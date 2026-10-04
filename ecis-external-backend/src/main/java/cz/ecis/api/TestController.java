@@ -4,19 +4,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cz.ecis.core.environment.EnvTypeEnum;
-import cz.ecis.model.dto.EnvDto;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("api/ext/v1")
 @RequiredArgsConstructor
-public class EnvController implements EnvApiInterface {
+public class TestController implements TestApiInterface {
+
+    public static final String TEST_OK_RESPONSE = "OK";
 
     @Override
-    public ResponseEntity<EnvDto> getAppEnv() {
-        EnvDto dto = new EnvDto("1", EnvTypeEnum.DEV);
-        return ResponseEntity.ok(dto);
+    public ResponseEntity<String> getTestResponse() {
+        return ResponseEntity.ok(TestController.TEST_OK_RESPONSE);
     }
     
 }

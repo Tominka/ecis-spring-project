@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd"
+    logicalFilePath="before-each-test.xml"
+>
+
+    <changeSet id="${test.uuid}-api_key-test-data" author="Tom">
+        <insert schemaName="security" tableName="api_key">
+            <column name="id" valueNumeric="1" />
+            <column name="name" value="test" />
+            <column name="key_hash" value="9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08" />
+            <column name="enabled" valueBoolean="true" />
+            <column name="created_by" value="SYSTEM" />
+        </insert>
+        <insert schemaName="security" tableName="api_key">
+            <column name="id" valueNumeric="2" />
+            <column name="name" value="test_disabled" />
+            <column name="key_hash" value="f2b88f4d038f2887cf0052def98890f8a7b892ded1d94223bed377052aed8aa5" />
+            <column name="enabled" valueBoolean="false" />
+            <column name="created_by" value="SYSTEM" />
+        </insert>
+    </changeSet>
+
+    <changeSet id="${test.uuid}-api_key-test-sequence" author="Tom">
+        <sql>
+            SELECT setval(
+                pg_get_serial_sequence('security.api_key', 'id'),
+                COALESCE((SELECT MAX(id) FROM security.api_key), 1)
+            );
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

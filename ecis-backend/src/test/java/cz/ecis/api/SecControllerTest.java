@@ -90,7 +90,7 @@ class SecControllerTest extends EcisIntegrationTestClient {
         );
         RefreshTokenRequestDto request = new RefreshTokenRequestDto();
         request.setRefreshToken(login.getRefreshToken());
-        this.withUserToken("refresh", login.getToken());
+        this.withUserToken("refresh", "Bearer " + login.getToken());
 
         LoginResponseDto response = this.runPost(
             SecController.PATH_REFRESH_TOKEN,

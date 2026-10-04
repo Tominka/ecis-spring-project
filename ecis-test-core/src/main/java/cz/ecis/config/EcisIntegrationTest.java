@@ -53,11 +53,11 @@ public abstract class EcisIntegrationTest {
 
     private boolean expectedEmptyContent = false;
 
-    protected String testUserToken = null;
-
     abstract String getApiDefaultApiRoute();
     
-    abstract List<EcistTestUserCredential> obtainUserCredetnials() throws Exception;
+    abstract List<EcisTestUserCredential> obtainUserCredentials() throws Exception;
+
+    abstract String getAuthorizationHeader();
 
     @BeforeAll
     void beforeAllTests() throws Exception {
@@ -70,10 +70,12 @@ public abstract class EcisIntegrationTest {
     }
 
     private void registerUserCredentials() throws Exception {
-        List<EcistTestUserCredential> credentials = this.obtainUserCredetnials();
+        List<EcisTestUserCredential> credentials = this.obtainUserCredentials();
         if (credentials != null) {
-            for (EcistTestUserCredential credential : credentials) {
-                 this.usersTokens.put(credential.name(), credential.token());
+            for (EcisTestUserCredential credential : credentials) {
+                if (credential != null) {
+                    this.usersTokens.put(credential.name(), credential.token());
+                }
             }
         }
     }
@@ -153,10 +155,15 @@ public abstract class EcisIntegrationTest {
             return null;
         }
 
-        return om.readValue(
-            result.getResponse().getContentAsString(),
-            resultType
-        );
+        String content = result.getResponse().getContentAsString();
+        if (content.isBlank()) {
+            return null;
+        }
+        if (String.class.equals(resultType.getRawClass())) {
+            return om.convertValue(content, resultType);
+        }
+
+        return om.readValue(content, resultType);
     }
 
     private MvcResult runClient(
@@ -166,8 +173,10 @@ public abstract class EcisIntegrationTest {
         .header("User-Agent", "JUnit-Test")
         .contentType(MediaType.APPLICATION_JSON);
 
-        if (user != null && usersTokens.containsKey(user)) {
-            req.header("Authorization", "Bearer " + usersTokens.get(user));
+        String authorizationHeader = this.getAuthorizationHeader();
+
+        if (authorizationHeader != null && user != null && usersTokens.containsKey(user)) {
+            req.header(authorizationHeader, usersTokens.get(user));
         }
     
         for (Entry<String, String> header : this.additionalHeaders.entrySet()) {
@@ -227,6 +236,6 @@ public abstract class EcisIntegrationTest {
         GET, POST, PUT, PATCH, DELETE;
     }
 
-    public static record EcistTestUserCredential(String name, String token) {}
+    public static record EcisTestUserCredential(String name, String token) {}
     
 }

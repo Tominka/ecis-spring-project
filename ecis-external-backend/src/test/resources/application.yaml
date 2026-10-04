@@ -5,19 +5,17 @@ spring:
     active: test
   datasource:
     jdbc-url: jdbc:postgresql://localhost:15432/ecis
-    username: ecis_apl
-    password: ecis_apl
+    username: ecis_ext_apl
+    password: ecis_ext_apl
     driver-class-name: org.postgresql.Driver
-  
   liquibase:
     enabled: true
-    change-log: classpath:db/changelog/changelog-master.xml
-    liquibaseSchema: public
-    url: jdbc:postgresql://localhost:15432/ecis
-    user: ecis
+    jdbc-url: jdbc:postgresql://localhost:15432/ecis
+    username: ecis
     password: ecis
     driver-class-name: org.postgresql.Driver
-
+    liquibaseSchema: public
+  
   jpa:
     open-in-view: false
     properties:
@@ -56,3 +54,5 @@ ecis:
 
 password:
   validityDays: 127
+
+testing: true

@@ -10,7 +10,9 @@ import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 
 import java.util.Map;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import javax.sql.DataSource;
@@ -37,27 +39,19 @@ public class LiquibaseExtension implements TestExecutionListener {
 
         context.setAttribute("liquibase.test.uuid", uuid);
 
-        findBeforeAnnotationInClass(context).ifPresent(annotation ->
-            runLiquibase(
-                annotation.changeLog(),
-                annotation.dataSourceId(),
-                context,
-                testUuid
-            )
-        );
+        for (TestLiquibaseBefore annotation : findBeforeAnnotationsInClass(context)) {
+            runLiquibase(annotation.changeLog(), annotation.dataSourceId(), context, testUuid);
+        }
     }
 
     @Override
     public void afterTestClass(final TestContext context) throws Exception {
         final String uuid = (String) context.getAttribute("liquibase.test.uuid");
-        findAfterAnnotationInClass(context).ifPresent(annotation ->
-            runLiquibase(
-                annotation.changeLog(),
-                annotation.dataSourceId(),
-                context,
-                uuid
-            )
-        );
+        List<TestLiquibaseAfter> annotations = findAfterAnnotationsInClass(context);
+        for (int index = annotations.size() - 1; index >= 0; index--) {
+            TestLiquibaseAfter annotation = annotations.get(index);
+            runLiquibase(annotation.changeLog(), annotation.dataSourceId(), context, uuid);
+        }
     }
 
     @Override
@@ -93,29 +87,34 @@ public class LiquibaseExtension implements TestExecutionListener {
         applicationContext.getBeanFactory().initializeBean(liquibase, beanName);
     }
 
-    private Optional<TestLiquibaseBefore> findBeforeAnnotationInClass(TestContext context) {
-        MergedAnnotation<TestLiquibaseBefore> annotation =
-            MergedAnnotations.from(
-                context.getTestClass(),
-                MergedAnnotations.SearchStrategy.TYPE_HIERARCHY
-            )
-            .get(TestLiquibaseBefore.class);
-
-        return annotation.isPresent()
-            ? Optional.of(annotation.synthesize())
-            : Optional.empty();
+    private List<TestLiquibaseBefore> findBeforeAnnotationsInClass(TestContext context) {
+        List<TestLiquibaseBefore> annotations = new ArrayList<>();
+        for (Class<?> testClass : getClassHierarchy(context)) {
+            TestLiquibaseBefore annotation = testClass.getDeclaredAnnotation(TestLiquibaseBefore.class);
+            if (annotation != null) {
+                annotations.add(annotation);
+            }
+        }
+        return annotations;
     }
 
-    private Optional<TestLiquibaseAfter> findAfterAnnotationInClass(TestContext context) {
-        MergedAnnotation<TestLiquibaseAfter> annotation =
-            MergedAnnotations.from(
-                context.getTestClass(),
-                MergedAnnotations.SearchStrategy.TYPE_HIERARCHY
-            )
-            .get(TestLiquibaseAfter.class);
+    private List<TestLiquibaseAfter> findAfterAnnotationsInClass(TestContext context) {
+        List<TestLiquibaseAfter> annotations = new ArrayList<>();
+        for (Class<?> testClass : getClassHierarchy(context)) {
+            TestLiquibaseAfter annotation = testClass.getDeclaredAnnotation(TestLiquibaseAfter.class);
+            if (annotation != null) {
+                annotations.add(annotation);
+            }
+        }
+        return annotations;
+    }
 
-        return annotation.isPresent()
-            ? Optional.of(annotation.synthesize())
-            : Optional.empty();
+    private List<Class<?>> getClassHierarchy(TestContext context) {
+        List<Class<?>> hierarchy = new ArrayList<>();
+        for (Class<?> type = context.getTestClass(); type != null && type != Object.class; type = type.getSuperclass()) {
+            hierarchy.add(type);
+        }
+        Collections.reverse(hierarchy);
+        return hierarchy;
     }
 }

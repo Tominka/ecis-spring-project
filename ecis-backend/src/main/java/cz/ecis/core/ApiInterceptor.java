@@ -46,5 +46,6 @@ public class ApiInterceptor implements HandlerInterceptor {
         ThreadContext.put("duration", String.valueOf(EcisContext.getRequestTime()));
         LOGGER.info("API call done");
         ThreadContext.clearAll();
+        EcisLocaleContext.clear();
     }
 }

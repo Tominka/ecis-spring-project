@@ -1314,4 +1314,9 @@
 
     </changeSet>
 
+    <changeSet id="19-remove-forgotten-old-relations" author="Tom">
+        <dropColumn schemaName="ecis" tableName="parent" columnName="id_camp" />
+        <dropColumn schemaName="ecis" tableName="child" columnName="id_camp" />
+    </changeSet>
+
 </databaseChangeLog>

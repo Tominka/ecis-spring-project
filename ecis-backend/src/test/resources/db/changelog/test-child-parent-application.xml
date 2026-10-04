@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd"
+    logicalFilePath="test-child-parent-application.xml"
+>
+
+    <changeSet id="${test.uuid}-child-parent-application-test-data" author="Tom">
+        <insert schemaName="ecis" tableName="child">
+            <column name="id" valueNumeric="1" />
+            <column name="name" value="Test" />
+            <column name="surname" value="Child" />
+            <column name="address" value="Test address" />
+            <column name="birthdate" value="2018-01-02" />
+            <column name="created_by" value="SYSTEM" />
+        </insert>
+        <insert schemaName="ecis" tableName="parent">
+            <column name="id" valueNumeric="1" />
+            <column name="name" value="Test" />
+            <column name="surname" value="Parent" />
+            <column name="address" value="Parent address" />
+            <column name="phone" value="1234567890" />
+            <column name="email" value="parent@example.test" />
+            <column name="created_by" value="SYSTEM" />
+        </insert>
+        <insert schemaName="ecis" tableName="application">
+            <column name="id" valueNumeric="1" />
+            <column name="id_child" valueNumeric="1" />
+            <column name="id_camp" valueNumeric="1" />
+            <column name="created_by" value="SYSTEM" />
+        </insert>
+        <insert schemaName="ecis" tableName="application_parent">
+            <column name="id" valueNumeric="1" />
+            <column name="id_application" valueNumeric="1" />
+            <column name="id_parent" valueNumeric="1" />
+            <column name="created_by" value="SYSTEM" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>

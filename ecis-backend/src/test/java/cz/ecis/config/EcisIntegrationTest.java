@@ -24,6 +24,7 @@ import cz.ecis.config.liquibase.TestLiquibaseBefore;
 import cz.ecis.model.dto.LoginRequestDto;
 import cz.ecis.model.dto.LoginResponseDto;
 import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JavaType;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -102,16 +103,9 @@ public abstract class EcisIntegrationTest {
 
     private void obtainUserToken(String username, String password) throws Exception {
         LoginRequestDto dto = new LoginRequestDto(username, password);
-        String result = mockMvc.perform(
-            post("/api/v1" + SecController.PATH_LOGIN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("User-Agent", "JUnit-Test")
-                .content(om.writeValueAsString(dto))
-        ).andReturn().getResponse().getContentAsString();
+        LoginResponseDto response = this.runPost(SecController.PATH_LOGIN, null, dto, LoginResponseDto.class);
 
-        testUserToken = om.readValue(result, new TypeReference<LoginResponseDto>() {}).getToken();
-
-        this.usersTokens.put(username, testUserToken);
+        this.usersTokens.put(username, response.getToken());
     }
 
     public void addUrlParam(String key, Object value) {
@@ -119,206 +113,63 @@ public abstract class EcisIntegrationTest {
     }
 
     public <T> T runGet(String path, String user, Class<T> resultClass) throws Exception {
-        MvcResult result = runClientGet(path, user);
-
-        if (this.expectedEmptyContent) {
-            this.expectedEmptyContent = false;
-            return null;
-        }
-        return om.readValue(
-            result.getResponse().getContentAsString(),
-            resultClass
-        );
+        MvcResult result = runClient(EcisRequestMethod.GET, path, null, user);
+        return this.readResult(result, om.constructType(resultClass));
     }
 
     public <T> T runGet(String path, String user, TypeReference<T> resultClass) throws Exception {
-        MvcResult result = runClientGet(path, user);
-
-        if (this.expectedEmptyContent) {
-            this.expectedEmptyContent = false;
-            return null;
-        }
-        return om.readValue(
-            result.getResponse().getContentAsString(),
-            resultClass
-        );
+        MvcResult result = runClient(EcisRequestMethod.GET, path, null, user);
+        return this.readResult(result, om.constructType(resultClass.getType()));
     }
 
     public <T> T runPost(String path, String user, Object body, Class<T> resultClass) throws Exception {
-        MvcResult result = runClientPost(path, body, user);
-        if (this.expectedEmptyContent) {
-            this.expectedEmptyContent = false;
-            return null;
-        }
-        return om.readValue(
-            result.getResponse().getContentAsString(),
-            resultClass
-        );
+        MvcResult result = runClient(EcisRequestMethod.POST, path, body, user);
+        return this.readResult(result, om.constructType(resultClass));
     }
 
     public <T> T runPost(String path, String user, Object body, TypeReference<T> resultClass) throws Exception {
-        MvcResult result = runClientPost(path, body, user);
-
-        if (this.expectedEmptyContent) {
-            this.expectedEmptyContent = false;
-            return null;
-        }
-        return om.readValue(
-            result.getResponse().getContentAsString(),
-            resultClass
-        );
+        MvcResult result = runClient(EcisRequestMethod.POST, path, body, user);
+        return this.readResult(result, om.constructType(resultClass.getType()));
     }
 
     public <T> T runPut(String path, String user, Object body, Class<T> resultClass) throws Exception {
-        MvcResult result = runClientPut(path, body, user);
-
-        if (this.expectedEmptyContent) {
-            this.expectedEmptyContent = false;
-            return null;
-        }
-        return om.readValue(
-            result.getResponse().getContentAsString(),
-            resultClass
-        );
+        MvcResult result = runClient(EcisRequestMethod.PUT, path, body, user);
+        return this.readResult(result, om.constructType(resultClass));
     }
 
     public <T> T runPut(String path, String user, Object body, TypeReference<T> resultClass) throws Exception {
-        MvcResult result = runClientPut(path, body, user);
-
-        if (this.expectedEmptyContent) {
-            this.expectedEmptyContent = false;
-            return null;
-        }
-        return om.readValue(
-            result.getResponse().getContentAsString(),
-            resultClass
-        );
+        MvcResult result = runClient(EcisRequestMethod.PUT, path, body, user);
+        return this.readResult(result, om.constructType(resultClass.getType()));
     }
 
     public <T> T runPatch(String path, String user, Object body, Class<T> resultClass) throws Exception {
-        MvcResult result = runClientPatch(path, body, user);
-
-        if (this.expectedEmptyContent) {
-            this.expectedEmptyContent = false;
-            return null;
-        }
-        return om.readValue(
-            result.getResponse().getContentAsString(),
-            resultClass
-        );
+        MvcResult result = runClient(EcisRequestMethod.PATCH, path, body, user);
+        return this.readResult(result, om.constructType(resultClass));
     }
 
     public <T> T runPatch(String path, String user, Object body, TypeReference<T> resultClass) throws Exception {
-        MvcResult result = runClientPatch(path, body, user);
+        MvcResult result = runClient(EcisRequestMethod.PATCH, path, body, user);
+        return this.readResult(result, om.constructType(resultClass.getType()));
+    }
 
+    private <T> T readResult(MvcResult result, JavaType resultType) throws Exception {
         if (this.expectedEmptyContent) {
             this.expectedEmptyContent = false;
             return null;
         }
+
         return om.readValue(
             result.getResponse().getContentAsString(),
-            resultClass
+            resultType
         );
     }
 
-    private MvcResult runClientGet(String path, String user) throws Exception {
-        path = this.resolveFinalPath(path);
-
-        MockHttpServletRequestBuilder req = get(DEFAULT_API_ROUTE + path)
-            .header("User-Agent", "JUnit-Test")
-            .contentType(MediaType.APPLICATION_JSON);
-
-        if (user != null && usersTokens.containsKey(user)) {
-            req.header("Authorization", "Bearer " + usersTokens.get(user));
-        }
-
-        for (Entry<String, String> header : this.additionalHeaders.entrySet()) {
-            req.header(header.getKey(), header.getValue());
-        }
-
-        ResultActions result = mockMvc.perform(req)
-            .andExpect(status().is(this.expectedStatus.value()));
-        
-        if (this.expectedEmptyContent) {
-            result = result.andExpect(status().isNoContent());
-        }
-        
-        this.expectedStatus = HttpStatus.OK;
-        this.additionalHeaders.clear();
-
-        return result.andReturn();
-    }
-
-    private MvcResult runClientPost(String path, Object body, String user) throws Exception {
-        path = this.resolveFinalPath(path);
-        
-        MockHttpServletRequestBuilder req = post(DEFAULT_API_ROUTE + path)
-            .header("User-Agent", "JUnit-Test")
-            .contentType(MediaType.APPLICATION_JSON);
-
-        if (user != null && usersTokens.containsKey(user)) {
-            req.header("Authorization", "Bearer " + usersTokens.get(user));
-        }
-
-        for (Entry<String, String> header : this.additionalHeaders.entrySet()) {
-            req.header(header.getKey(), header.getValue());
-        }
-
-        if (body != null) {
-            req.content(
-                this.om.writeValueAsString(body)
-            );
-        }
-
-        ResultActions result = mockMvc.perform(req)
-            .andExpect(status().is(this.expectedStatus.value()));
-        
-        if (this.expectedEmptyContent) {
-            result = result.andExpect(status().isNoContent());
-        }
-        
-        this.expectedStatus = HttpStatus.OK;
-        this.additionalHeaders.clear();
-
-        return result.andReturn();
-    }
-
-    private MvcResult runClientPut(String path, Object body, String user) throws Exception {
-        path = this.resolveFinalPath(path);
-        
-        MockHttpServletRequestBuilder req = put(DEFAULT_API_ROUTE + path)
-            .header("User-Agent", "JUnit-Test")
-            .contentType(MediaType.APPLICATION_JSON);
-
-        if (user != null && usersTokens.containsKey(user)) {
-            req.header("Authorization", "Bearer " + usersTokens.get(user));
-        }
-
-        if (body != null) {
-            req.content(
-                this.om.writeValueAsString(body)
-            );
-        }
-
-        ResultActions result = mockMvc.perform(req)
-            .andExpect(status().is(this.expectedStatus.value()));
-        
-        if (this.expectedEmptyContent) {
-            result = result.andExpect(status().isNoContent());
-        }
-        
-        this.expectedStatus = HttpStatus.OK;
-        this.additionalHeaders.clear();
-
-        return result.andReturn();
-    }
-
-    private MvcResult runClientPatch(String path, Object body, String user) throws Exception {
-        path = this.resolveFinalPath(path);
-        
-        MockHttpServletRequestBuilder req = patch(DEFAULT_API_ROUTE + path)
-            .header("User-Agent", "JUnit-Test")
-            .contentType(MediaType.APPLICATION_JSON);
+    private MvcResult runClient(
+        EcisRequestMethod method, String path, Object body, String user
+    ) throws Exception {
+        MockHttpServletRequestBuilder req = this.resolveRequest(path, method)
+        .header("User-Agent", "JUnit-Test")
+        .contentType(MediaType.APPLICATION_JSON);
 
         if (user != null && usersTokens.containsKey(user)) {
             req.header("Authorization", "Bearer " + usersTokens.get(user));
@@ -357,6 +208,28 @@ public abstract class EcisIntegrationTest {
         }
 
         return path;
+    }
+
+    private MockHttpServletRequestBuilder resolveRequest(String path, EcisRequestMethod method) {
+        String finalPath = DEFAULT_API_ROUTE + this.resolveFinalPath(path);
+        switch (method) {
+            case GET:
+                return get(finalPath);
+            case POST:
+                return post(finalPath);
+            case PUT:
+                return put(finalPath);
+            case PATCH:
+                return patch(finalPath);
+            case DELETE:
+                return delete(finalPath);
+            default:
+                return null;
+        }
+    }
+
+    public static enum EcisRequestMethod {
+        GET, POST, PUT, PATCH, DELETE;
     }
     
 }

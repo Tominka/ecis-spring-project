@@ -14,6 +14,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import cz.ecis.core.EcisContext;
@@ -22,6 +23,7 @@ import cz.ecis.core.exception.EntityNotExistsException;
 import cz.ecis.core.security.CampSecurityContext;
 import cz.ecis.core.security.EcisRoleEnum;
 import cz.ecis.core.security.EcisUserDetails;
+import cz.ecis.core.security.annotation.CampSecured;
 import cz.ecis.db.ent.CampEnt;
 import cz.ecis.db.ent.UserEnt;
 import cz.ecis.db.repo.CampRepository;
@@ -75,6 +77,14 @@ public class CampInterceptor implements HandlerInterceptor {
 
         EcisContext.getRequest().getEntry().setAuthorized(true);
 
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+
+        CampSecured annotation = handlerMethod.getMethodAnnotation(CampSecured.class);
+
+        if (annotation != null) {
+            this.checkAnnotation(annotation);
+        }
+
         return true;
     }
 
@@ -125,5 +135,29 @@ public class CampInterceptor implements HandlerInterceptor {
             LOGGER.warn("Invalid X-Camp-Id header value: {}", campId);
             return null;
         }
+    }
+
+    private void checkAnnotation(CampSecured campSecured) {
+        EcisContext.getRequest().getEntry().setAuthorized(false);
+        try {
+            Long campId = CampSecurityContext.getCampId();
+            if (campId == null || campId <= 0) {
+                UserEnt user = SecurityUtils.getUserEnt();
+                LOGGER.warn("No camp ID provided in request, but user {} is authenticated. Access to camp-specific resources is not allowed.", user != null ? user.getUsername() : "anonymous");
+                throw new AccessDeniedException("Camp ID is required for accessing camp-specific resources");
+            }
+        }
+        catch (CampResolveException e) {
+            throw e;
+        }
+        catch (Exception _) {
+            throw new CampResolveException("Required Camp id is not set");
+        }
+
+        if (campSecured.roles().length == 0 || SecurityUtils.hasAnyRole(campSecured.roles())) {
+            EcisContext.getRequest().getEntry().setAuthorized(true);
+            return; // User has at least one of the required roles, allow access
+        }
+        throw new AccessDeniedException("User does not have the required roles");
     }
 }

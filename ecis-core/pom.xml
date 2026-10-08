@@ -74,9 +74,14 @@
 			<optional>true</optional>
 		</dependency>
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>tools.jackson.module</groupId>
 			<artifactId>jackson-module-afterburner</artifactId>
+		</dependency> -->
+
+		<dependency>
+			<groupId>tools.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
 		</dependency>
 
 		<dependency>

@@ -14,7 +14,7 @@ import tools.jackson.databind.ValueSerializer;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
-import tools.jackson.module.afterburner.AfterburnerModule;
+// import tools.jackson.module.afterburner.AfterburnerModule;
 
 @Configuration
 public class JacksonConfig {
@@ -34,7 +34,7 @@ public class JacksonConfig {
         });
 
         return JsonMapper.builder()
-            .addModule(new AfterburnerModule())
+            // .addModule(new AfterburnerModule())
             .addModule(javaTimeModule)
             .propertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)

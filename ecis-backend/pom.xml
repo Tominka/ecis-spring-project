@@ -281,6 +281,40 @@
 							</configOptions>
 						</configuration>
 					</execution>
+					<execution>
+						<id>application</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/openapi/application-api.yaml</inputSpec>
+							<generatorName>spring</generatorName>
+							<apiPackage>cz.ecis.api</apiPackage>
+							<modelPackage>cz.ecis.model.dto</modelPackage>
+							<apiNameSuffix>ApiInterface</apiNameSuffix>
+							<importMappings>
+								ParentDto=cz.ecis.model.dto.ParentDto,
+								ChildDto=cz.ecis.model.dto.ChildDto,
+								CampDto=cz.ecis.model.dto.CampDto,
+								EnvTypeEnum=cz.ecis.core.environment.EnvTypeEnum,
+								ErrorDto=cz.ecis.core.model.ErrorDto
+							</importMappings>
+							<typeMappings>
+								ParentDto=cz.ecis.model.dto.ParentDto,
+								ChildDto=cz.ecis.model.dto.ChildDto,
+								CampDto=cz.ecis.model.dto.CampDto,
+								EnvTypeEnum=cz.ecis.core.environment.EnvTypeEnum,
+								ErrorDto=cz.ecis.core.model.ErrorDto
+							</typeMappings>
+							<configOptions>
+								<useSpringBoot4>true</useSpringBoot4>
+								<interfaceOnly>true</interfaceOnly>
+								<useBeanValidation>true</useBeanValidation>
+								<delegatePattern>false</delegatePattern>
+								<useJakartaEe>true</useJakartaEe>
+							</configOptions>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>

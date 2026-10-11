@@ -13,7 +13,7 @@ import cz.ecis.model.dto.EnvDto;
 import lombok.RequiredArgsConstructor;
 import tools.jackson.core.type.TypeReference;
 
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class EnvControllerTest extends EcisIntegrationTestClient {
 

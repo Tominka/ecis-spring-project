@@ -1,0 +1,7 @@
+code,translations,extension,valid_from,created_by
+DOCX,"{""cs"":{""name"":""Microsoft Word"",""description"":""Microsoft Word dokument""},""en"":{""name"":""Microsoft Word"",""description"":""Microsoft Word document""}}",docx,current_timestamp(),SYSTEM
+DOC,"{""cs"":{""name"":""Microsoft Word"",""description"":""Microsoft Word dokument""},""en"":{""name"":""Microsoft Word"",""description"":""Microsoft Word document""}}",doc,current_timestamp(),SYSTEM
+XLSX,"{""cs"":{""name"":""Microsoft Excel"",""description"":""Microsoft Excel dokument""},""en"":{""name"":""Microsoft Excel"",""description"":""Microsoft Excel document""}}",xlsx,current_timestamp(),SYSTEM
+XLS,"{""cs"":{""name"":""Microsoft Excel"",""description"":""Microsoft Excel dokument""},""en"":{""name"":""Microsoft Excel"",""description"":""Microsoft Excel document""}}",xls,current_timestamp(),SYSTEM
+PDF,"{""cs"":{""name"":""PDF"",""description"":""PDF dokument""},""en"":{""name"":""PDF"",""description"":""PDF document""}}",pdf,current_timestamp(),SYSTEM
+TXT,"{""cs"":{""name"":""Textový soubor"",""description"":""Textový soubor""},""en"":{""name"":""Text file"",""description"":""Text file""}}",txt,current_timestamp(),SYSTEM

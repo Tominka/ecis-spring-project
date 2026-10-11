@@ -1319,4 +1319,176 @@
         <dropColumn schemaName="ecis" tableName="child" columnName="id_camp" />
     </changeSet>
 
+    <changeSet id="20-add-application-documents" author="Tom">
+        <createTable schemaName="lookup" tableName="lkp_document_type">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="translations" type="JSONB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="extension" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="valid_from" type="timestamp with time zone">
+                <constraints nullable="false" />
+            </column>
+            <column name="valid_to" type="timestamp with time zone" />
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable schemaName="audit" tableName="lkp_document_type_history">
+            <column name="id" type="UUID" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_revision" type="BIGINT" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="revision_type" type="smallint" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(50)"/>
+            <column name="translations" type="JSONB" />
+            <column name="extension" type="VARCHAR(50)"/>
+            <column name="valid_from" type="timestamp with time zone"/>
+            <column name="valid_to" type="timestamp with time zone" />
+            <column name="created_at" type="timestamp with time zone" />
+            <column name="created_by" type="VARCHAR(255)" />
+            <column name="updated_at" type="timestamp with time zone" />
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" />
+        </createTable>
+
+        <addPrimaryKey schemaName="audit" tableName="lkp_document_type_history"
+            columnNames="id,id_revision"
+            constraintName="lkp_document_type_history_pk" />
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="audit"
+            baseTableName="lkp_document_type_history"
+            baseColumnNames="id_revision"
+            referencedTableSchemaName="audit"
+            referencedTableName="revision"
+            referencedColumnNames="id"
+            constraintName="lkp_document_type_history_revision_fk"
+        />
+
+        <loadData
+            file="db/data/data-0.0.1-lookup_document_type.csv"
+            schemaName="lookup"
+            tableName="lkp_document_type"
+            separator=","
+        />
+        <sql dbms="postgresql" endDelimiter=";">
+            WITH new_revision AS (
+                INSERT INTO audit.revision (created_at, username, source)
+                VALUES (current_timestamp, 'SYSTEM', 'SCRIPT')
+                RETURNING id
+            )
+            INSERT INTO audit.lkp_document_type_history (
+                id, id_revision, revision_type, code, translations, extension, valid_from, valid_to, created_at, created_by, updated_at, updated_by, version
+            )
+            SELECT l.id, r.id, 0, l.code, l.translations, l.extension, l.valid_from, l.valid_to, l.created_at, l.created_by, l.updated_at, l.updated_by, l.version
+            FROM lookup.lkp_document_type l
+            CROSS JOIN new_revision r;
+        </sql>
+
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT ON TABLE lookup.lkp_document_type TO ecis_apl;
+            GRANT SELECT, UPDATE, INSERT ON TABLE audit.lkp_document_type_history TO ecis_apl;
+            GRANT SELECT ON TABLE lookup.lkp_document_type TO ecis_ext_apl;
+        </sql>
+
+        <createTable schemaName="ecis" tableName="application_document">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="id_application" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_document_type" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="filename" type="VARCHAR(510)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_location" type="VARCHAR(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_size" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone" defaultValueComputed="current_timestamp()">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="INT UNSIGNED" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="ecis"
+            baseTableName="application_document"
+            baseColumnNames="id_application"
+            referencedTableSchemaName="ecis"
+            referencedTableName="application"
+            referencedColumnNames="id"
+            constraintName="application_document_id_application_fk"
+        />
+        <addForeignKeyConstraint
+            baseTableSchemaName="ecis"
+            baseTableName="application_document"
+            baseColumnNames="id_document_type"
+            referencedTableSchemaName="lookup"
+            referencedTableName="lkp_document_type"
+            referencedColumnNames="id"
+            constraintName="application_document_id_document_type_fk"
+        />
+
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT ON TABLE ecis.application_document TO ecis_apl;
+
+            GRANT SELECT, UPDATE, INSERT ON TABLE ecis.application_document TO ecis_ext_apl;
+        </sql>
+
+    </changeSet>
+
+    <changeSet id="20-add-application-overview" author="Tom">
+        <sql dbms="postgresql" endDelimiter=";">
+            CREATE OR REPLACE VIEW ecis.application_overview_vie AS
+                select
+                    a.*,
+                    COUNT(ad.id_application) OVER (PARTITION BY a.id) AS document_count
+                from ecis.application a
+                left join ecis.application_document ad on ad.id_application = a.id
+        </sql>
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT ON TABLE ecis.application_overview_vie TO ecis_apl;
+
+            GRANT SELECT ON TABLE ecis.application_overview_vie TO ecis_ext_apl;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

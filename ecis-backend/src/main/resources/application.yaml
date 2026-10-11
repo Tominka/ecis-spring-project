@@ -98,6 +98,8 @@ springdoc:
 ecis:
   app:
     displayAppName: DevApp
+  storage:
+    directory: "storage"
   login:
     enableAttemptProtection: true
     enablePasswordExpiration: true
@@ -107,12 +109,9 @@ ecis:
   jwt:
     access:
       secretKey: afdssiojsdaoziufhiufhisudkjhzsidukjkudszhfwiuzghwqiuwqkzdqw
-      validity: 900
+      validity: 14400
     refresh:
       secretKey: afdssiojsdaoziufhiufhisudkjhzsidukjkudszhfwiuzghwqiuwqkzdqwsdadadadadsad
       validity: 86400
   audit:
     defaultAuditor: SYSTEM
-
-password:
-  validityDays: 127

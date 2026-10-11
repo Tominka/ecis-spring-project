@@ -1,8 +1,13 @@
 package cz.ecis.config;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 import cz.ecis.EcisTestApplication;
 import cz.ecis.api.SecController;
@@ -20,7 +25,22 @@ public abstract class EcisIntegrationTestClient extends EcisIntegrationTest  {
 
     private static final String DEFAULT_API_ROUTE = "/api/v1";
 
-    @Override 
+    protected static final Path TEMP_DIR;
+
+    static {
+        try {
+            TEMP_DIR = Files.createTempDirectory("uploads-test-");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @DynamicPropertySource
+    static void properties(DynamicPropertyRegistry registry) {
+        registry.add("ecis.storage.directory", TEMP_DIR::toString);
+    }
+
+    @Override
     String getApiDefaultApiRoute() {
         return EcisIntegrationTestClient.DEFAULT_API_ROUTE;
     }

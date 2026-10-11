@@ -4,19 +4,13 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import cz.ecis.core.exception.EntityNotExistsException;
 import cz.ecis.core.mapper.LovDtoMapper;
 import cz.ecis.core.model.LovDto;
 import cz.ecis.core.security.CampSecurityContext;
-import cz.ecis.db.ent.CampEnt;
-import cz.ecis.db.repo.CampBaseRepository;
+import cz.ecis.db.ent.ChildEnt;
 import cz.ecis.db.repo.ChildRepository;
-import cz.ecis.mapper.CampMapper;
 import cz.ecis.mapper.ChildMapper;
-import cz.ecis.model.dto.CampDto;
 import cz.ecis.model.dto.ChildDto;
-import cz.ecis.utils.SecurityUtils;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -43,53 +37,14 @@ public class ChildService {
             .toList();
     }
 
-    // public CampDto create(CampDto dto) {
-    //     if (dto.getDateTo() != null && dto.getDateFrom().isAfter(dto.getDateTo())) {
-    //         throw new IllegalRecordStateException("Dto check failed", "Date from must be before or equals to date to");
-    //     }
+    public ChildEnt findChildOrCreate(ChildDto dto) {
+        return this.childRepository.findByNameAndSurnameAndBirthdateAndAddress(
+            dto.getName(), dto.getSurname(), dto.getBirthdate(), dto.getAddress()
+        ).orElseGet(() -> {
+            ChildEnt newChild = this.childMapper.create(dto);
+            return this.childRepository.save(newChild);
+        });
+    }
 
-    //     return this.campMapper.toDto(
-    //         this.createCamp(dto)
-    //     );
-    // }
-
-    // public CampDto updateById(Long id, CampDto dto) {
-    //     CrudUtils.checkIdViolation(id, dto.getId());
-    //     CampEnt ent = SecurityUtils.getUserCampById(id);
-
-    //     return this.campMapper.toDto(
-    //         this.updateCamp(ent, dto)
-    //     );
-    // }
-
-    // @Transactional
-    // public CampDto userFindById(Long id) {
-    //     return campMapper.toDto(
-    //         SecurityUtils.getUserCamps().stream()
-    //             .filter(c -> c.getId().equals(id))
-    //             .findFirst()
-    //             .orElseThrow(() -> new EntityNotExistsException("Camp with given id not found", id))
-    //     );
-    // }
-
-    // @Transactional
-    // public CampEnt findById(Long id) {
-    //     return this.campRepository.findById(id)
-    //         .orElseThrow(() -> new EntityNotExistsException("Camp with given id not found", id));
-    // }
-
-    // @Transactional
-    // private CampEnt updateCamp(CampEnt ent, CampDto dto) {
-    //     CrudUtils.checkEntityVersion(ent.getVersion(), dto.getVersion());
-    //     this.campMapper.update(ent, dto);
-    //     return this.campRepository.save(ent);
-    // }
-
-    // @Transactional
-    // private CampEnt createCamp(CampDto dto) {
-    //     return this.campRepository.save(
-    //         this.campMapper.create(dto)
-    //     );
-    // }
-
+    public record ChildCreateResult(ChildDto child, boolean found) {}
 }

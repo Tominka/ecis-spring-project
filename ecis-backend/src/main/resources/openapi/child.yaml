@@ -90,6 +90,7 @@ components:
         - name
         - surname
         - address
+        - birthdate
       properties:
         id:
           type: integer

@@ -1,5 +1,6 @@
 package cz.ecis.db.ent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.envers.Audited;
@@ -7,10 +8,11 @@ import org.hibernate.envers.NotAudited;
 
 import cz.ecis.core.ent.ILovEntity;
 import cz.ecis.core.ent.VersionAwareEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -39,9 +41,14 @@ public class ParentEnt extends VersionAwareEntity<Long> implements ILovEntity {
     @Column(name = "email", length = 255, nullable = true)
     private String email;
 
+    @OneToMany(
+        mappedBy = "parent",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
     @NotAudited
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "parents")
-    private List<ApplicationEnt> applications;
+    private List<ApplicationParentEnt> applications = new ArrayList<>();
 
     @Override
     public String getLabel() {

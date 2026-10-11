@@ -68,13 +68,13 @@
 			<dependency>
 				<groupId>org.springdoc</groupId>
 				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-				<version>3.0.3</version>
+				<version>3.1.1</version>
 			</dependency>
 
 			<dependency>
-				<groupId>tools.jackson.module</groupId>
-				<artifactId>jackson-module-afterburner</artifactId>
-				<version>3.2.3</version>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>2.22.0</version>
 				<scope>compile</scope>
 			</dependency>
 

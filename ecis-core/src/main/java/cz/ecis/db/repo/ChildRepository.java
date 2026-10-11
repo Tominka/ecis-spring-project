@@ -1,6 +1,8 @@
 package cz.ecis.db.repo;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import cz.ecis.core.repo.VersionAwareRepository;
 import cz.ecis.db.ent.ChildEnt;
@@ -22,4 +24,6 @@ public interface ChildRepository extends VersionAwareRepository<ChildEnt, Long> 
 
         return ent;
     }
+
+    Optional<ChildEnt> findByNameAndSurnameAndBirthdateAndAddress(String name, String surname, LocalDate birthdate, String address);
 }

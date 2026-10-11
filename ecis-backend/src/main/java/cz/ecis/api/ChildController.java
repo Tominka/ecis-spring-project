@@ -33,21 +33,4 @@ public class ChildController implements ChildApiInterface {
         return ResponseEntity.ok(this.childService.getAllLov());
     }
 
-    // @Override
-    // public ResponseEntity<CampDto> getCampById(Long id) {
-    //     return ResponseEntity.ok(this.campService.userFindById(id));
-    // }
-
-    // @Override
-    // @PreAuthorize("hasAuthority(T(cz.ecis.core.security.EcisRoleEnum).CAMP_EDIT.getCode())")
-    // public ResponseEntity<CampDto> updateCampById(Long id, CampDto dto) {
-    //     return ResponseEntity.ok(this.campService.updateById(id, dto));
-    // }
-
-    // @Override
-    // @PreAuthorize("hasAuthority(T(cz.ecis.core.security.EcisRoleEnum).CAMP_CREATE.getCode())")
-    // public ResponseEntity<CampDto> createCamp(CampDto dto) {
-    //     return ResponseEntity.ok(this.campService.create(dto));
-    // }
-
 }

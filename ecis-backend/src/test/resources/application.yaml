@@ -47,8 +47,7 @@ ecis:
       validity: 86400
   audit:
     defaultAuditor: SYSTEM
-
-password:
-  validityDays: 127
+  storage:
+    directory: "storage"
 
 testing: true

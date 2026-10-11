@@ -1,0 +1,132 @@
+package cz.ecis.service;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
+
+import cz.ecis.core.exception.DocumentCreateException;
+import cz.ecis.core.security.CampSecurityContext;
+import cz.ecis.core.settings.EcisStorageSettings;
+import cz.ecis.db.ent.ApplicationDocumentEnt;
+import cz.ecis.db.ent.ApplicationEnt;
+import cz.ecis.db.ent.ApplicationParentEnt;
+import cz.ecis.db.ent.CampEnt;
+import cz.ecis.db.ent.ChildEnt;
+import cz.ecis.db.ent.LkpDocumentTypeEnt;
+import cz.ecis.db.ent.ParentEnt;
+import cz.ecis.db.repo.ApplicationDocumentRepository;
+import cz.ecis.db.repo.ApplicationOverviewVieRepository;
+import cz.ecis.db.repo.ApplicationRepository;
+import cz.ecis.db.repo.LkpDocumentTypeRepository;
+import cz.ecis.mapper.ApplicationMapper;
+import cz.ecis.model.dto.ApplicationCreateDto;
+import cz.ecis.model.dto.ApplicationDocumentCreateDto;
+import cz.ecis.model.dto.ApplicationDto;
+import cz.ecis.model.dto.ApplicationOverviewDto;
+import cz.ecis.model.dto.ParentDto;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class ApplicationService {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private final EcisStorageSettings ecisStorageSettings;
+
+    private final ApplicationMapper applicationMapper;
+    private final ChildService childService;
+    private final ParentService parentService;
+    private final ApplicationRepository applicationRepository;
+    private final ApplicationDocumentRepository applicationDocumentRepository;
+    private final LkpDocumentTypeRepository lkpDocumentTypeRepository;
+    private final ApplicationOverviewVieRepository applicationOverviewVieRepository;
+
+    public List<ApplicationOverviewDto> getAllApplications() {
+        return this.applicationOverviewVieRepository.findAll().stream()
+            .map(this.applicationMapper::toOverviewDto)
+            .toList();
+    }
+
+    public ApplicationDto createApplication(ApplicationCreateDto dto) {
+        ApplicationEnt ent = createApplicationEnt(dto);
+        return applicationMapper.toDto(ent);
+    }
+
+    @Transactional
+    public ApplicationEnt createApplicationEnt(ApplicationCreateDto createDto) {
+
+        CampEnt camp = CampSecurityContext.getCamp();
+        ChildEnt child = childService.findChildOrCreate(createDto.getChild());
+
+        ApplicationEnt ent = applicationMapper.create(createDto);
+        ent.setCamp(camp);
+        ent.setChild(child);
+
+        for (ParentDto parentDto : createDto.getParents()) {
+            ParentEnt parent = parentService.findParentOrCreate(parentDto);
+
+            ApplicationParentEnt relation = new ApplicationParentEnt();
+            relation.setApplication(ent);
+            relation.setParent(parent);
+
+            ent.getParents().add(relation);
+        }
+
+        ent = applicationRepository.save(ent);
+
+        List<ApplicationDocumentEnt> documents = new ArrayList<>(createDto.getDocuments().size());
+        for (ApplicationDocumentCreateDto dto : createDto.getDocuments()) {
+            try {
+                documents.add(this.createDocument(dto, ent));
+            } catch (IOException e) {
+                LOGGER.error("Error during creating document {}", dto.getFilename(), e);
+                throw new DocumentCreateException("Error during creating document: " + dto.getFilename());
+            }
+        }
+        documents = applicationDocumentRepository.saveAll(documents);
+
+        ent.setDocuments(documents);
+
+        return ent;
+    }
+
+    public ApplicationDocumentEnt createDocument(ApplicationDocumentCreateDto dto, ApplicationEnt application) throws IOException {
+        byte[] file = dto.getData();
+        String extension = FilenameUtils.getExtension(dto.getFilename());
+        LkpDocumentTypeEnt type = this.lkpDocumentTypeRepository.findByExtensionIgnoreCaseValid(extension);
+        String generatedFilename = UUID.randomUUID().toString();
+        Path fullPath = Path.of(this.ecisStorageSettings.directory(), generatedFilename);
+
+        ApplicationDocumentEnt ent = new ApplicationDocumentEnt();
+        ent.setDocumentType(type);
+        ent.setFileLocation(fullPath.toString());
+        ent.setFilename(dto.getFilename());
+        ent.setApplication(application);
+
+        String fileSize = null;
+        try (InputStream inputStream = new ByteArrayInputStream(file)) {
+            fileSize = FileUtils.byteCountToDisplaySize(file.length);
+            Files.createDirectories(fullPath.getParent());
+            Files.copy(inputStream, fullPath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new IOException("Error during proccessing file " + dto.getFilename(), e);
+        }
+        ent.setFileSize(fileSize);
+
+        return ent;
+    }
+}

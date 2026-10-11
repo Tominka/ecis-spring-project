@@ -14,8 +14,7 @@ public interface ParentMapper {
     public ParentDto toDto(ParentEnt ent);
 
     @Mapping(target = "id", ignore = true)
-    // @Mapping(target = "camp", ignore = true)
-    // @Mapping(target = "children", ignore = true)
+    @Mapping(target = "applications", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
@@ -24,8 +23,7 @@ public interface ParentMapper {
     public void update(@MappingTarget ParentEnt ent, ParentDto dto);
 
     @Mapping(target = "id", ignore = true)
-    // @Mapping(target = "camp", ignore = true)
-    // @Mapping(target = "children", ignore = true)
+    @Mapping(target = "applications", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

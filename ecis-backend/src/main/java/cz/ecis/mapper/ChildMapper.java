@@ -15,6 +15,7 @@ public interface ChildMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "info", ignore = true)
+    @Mapping(target = "applications", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
@@ -24,6 +25,7 @@ public interface ChildMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "info", ignore = true)
+    @Mapping(target = "applications", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

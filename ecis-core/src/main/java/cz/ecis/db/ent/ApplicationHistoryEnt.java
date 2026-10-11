@@ -24,7 +24,7 @@ import lombok.Setter;
 public class ApplicationHistoryEnt {
 
     @EmbeddedId
-    private EcisAuditId pk;
+    private EcisAuditId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_revision", nullable = false, insertable=false, updatable=false)

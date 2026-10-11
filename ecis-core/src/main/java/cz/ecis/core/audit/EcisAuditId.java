@@ -7,11 +7,13 @@ import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Embeddable
 @Getter
 @Setter
 @EqualsAndHashCode
+@ToString
 public class EcisAuditId implements Serializable {
 
 	private static final long serialVersionUID = 1L;

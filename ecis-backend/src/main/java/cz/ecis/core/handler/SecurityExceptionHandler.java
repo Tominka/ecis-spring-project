@@ -29,9 +29,10 @@ public class SecurityExceptionHandler {
     @Hidden
     public ErrorDto handleBadCredentials(Exception ex) {
         Map<String, String> errors = new HashMap<>();
+        // TODO: check if EntityNotExistsException is reachable here
         switch (ex) {
             case EntityNotExistsException ene ->
-                errors.put("id", ene.getId() == null ? null : ene.getId().toString());
+                errors = ene.getMap();
             default -> {
                 // Not error specification
             }

@@ -1,6 +1,7 @@
 package cz.ecis.core.exception;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import lombok.Getter;
 
@@ -9,10 +10,18 @@ public class EntityNotExistsException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-    private final Serializable id;
+    private final Map<String, String> map;
+
+    public EntityNotExistsException(String message) {
+        this(message, Map.of());
+    }
 
     public EntityNotExistsException(String message, Serializable id) {
+        this(message, Map.of("id", id == null ? null : id.toString()));
+    }
+
+    public EntityNotExistsException(String message, Map<String, String> map) {
         super(message);
-        this.id = id;
+        this.map = map;
     }
 }

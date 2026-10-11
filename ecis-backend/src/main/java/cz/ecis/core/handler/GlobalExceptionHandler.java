@@ -18,6 +18,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import cz.ecis.core.exception.CampResolveException;
+import cz.ecis.core.exception.DocumentCreateException;
 import cz.ecis.core.exception.EcisRuntimeException;
 import cz.ecis.core.exception.EntityNotExistsException;
 import cz.ecis.core.model.ErrorDto;
@@ -36,6 +37,8 @@ public class GlobalExceptionHandler {
 
     public static final Logger LOGGER = LogManager.getLogger(GlobalExceptionHandler.class);
 
+    public static final String DEFAULT_UNKNOWN_ERROR = "An unexpected error occurred.";
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ApiResponse(
@@ -47,9 +50,13 @@ public class GlobalExceptionHandler {
         )
     )
     public ErrorDto handleAllExceptions(Exception ex) {
+        String message = DEFAULT_UNKNOWN_ERROR;
+        if (ex instanceof DocumentCreateException) {
+            message = ex.getMessage();
+        }
         return ExceptionHandlerUtils.handleError(
             HttpStatus.INTERNAL_SERVER_ERROR,
-            "An unexpected error occurred."
+            message
         );
     }
 
@@ -88,7 +95,7 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = new HashMap<>();
         switch (ex) {
             case EntityNotExistsException ene ->
-                errors.put("id", ene.getId() == null ? null : ene.getId().toString());
+                errors = ene.getMap();
             default -> {
                 // Not error specification
             }

@@ -71,7 +71,7 @@ public class CrudUtils {
     public static void checkEntityCamp(Long entCampId, Long campId, Class<?> entClazz) {
         if (entCampId == null || campId == null) {
             LOGGER.warn("Record %s has no camp assigned or camp id is not defined (is null). Permission denied for obtain", entClazz.getName());
-            throw new EntityNotExistsException("Record not found", null);
+            throw new EntityNotExistsException("Record not found", (Serializable)null);
         }
 
         if (!entCampId.equals(campId)) {
@@ -83,13 +83,13 @@ public class CrudUtils {
         LOGGER.warn(
             String.format("Record %s has incorrect camp check. {record_camp=%s;requested_camp=%s}. Permission denied for obtain", entClazz.getClass(), entCampId, campId)
         );
-        throw new EntityNotExistsException("Record not found", null);
+        throw new EntityNotExistsException("Record not found", (Serializable)null);
     }
 
-     public static void handleEntityNotFoundInCamp(Long campId, Class<?> entClazz) {
+    public static void handleEntityNotFoundInCamp(Long campId, Class<?> entClazz) {
         LOGGER.warn(
             String.format("Camp check failed. Record %s has not found in camp {requested_camp=%s}. Permission denied for obtain", entClazz.getClass(), campId)
         );
-        throw new EntityNotExistsException("Record not found", null);
+        throw new EntityNotExistsException("Record not found", (Serializable)null);
     }
 }

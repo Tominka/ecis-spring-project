@@ -1,12 +1,10 @@
 package cz.ecis.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +19,6 @@ import cz.ecis.model.dto.ApplicationDocumentCreateDto;
 import cz.ecis.model.dto.ApplicationDocumentDto;
 import cz.ecis.model.dto.ApplicationDto;
 import cz.ecis.model.dto.ApplicationOverviewDto;
-import cz.ecis.model.dto.CampDto;
 import cz.ecis.model.dto.ChildDto;
 import cz.ecis.model.dto.ParentDto;
 import tools.jackson.core.type.TypeReference;
@@ -30,8 +27,6 @@ import tools.jackson.core.type.TypeReference;
 class ApplicationControllerTest extends EcisIntegrationTestClient {
 
     List<ApplicationDto> createdApplications = new ArrayList<>();
-
-    Integer campIdTemp = -1;
 
     @Test
     @Order(1)
@@ -119,6 +114,52 @@ class ApplicationControllerTest extends EcisIntegrationTestClient {
         assertThat(child.getBirthdate()).isNotNull();
 
         assertThat(dto.getDocumentCount()).isEqualTo(1);
+    }
+
+    @Test
+    @Order(2)
+    void testGetApplicationById() throws Exception {
+
+        ApplicationDto createdApplication = this.createdApplications.get(0);
+
+        this.addUrlParam("id", createdApplication.getId());
+
+        ApplicationDto dto =  this.withHeader("X-Camp-Id", "1")
+            .runGet(ApplicationController.PATH_GET_APPLICATION_BY_ID, "test", ApplicationDto.class);
+
+        assertThat(dto.getCanceledAt()).isNull();
+        assertThat(dto.getConfirmedAt()).isNull();
+        assertThat(dto.getCreatedAt()).isNotNull();
+
+        ChildDto child = dto.getChild();
+        assertThat(child).isNotNull();
+        assertThat(child.getId()).isNotNull();
+        assertThat(child.getName()).isNotNull();
+        assertThat(child.getSurname()).isNotNull();
+        assertThat(child.getAddress()).isNotNull();
+        assertThat(child.getBirthdate()).isNotNull();
+
+        assertThat(dto.getParents()).isNotNull().hasSize(2);
+        ParentDto parentResult1 = dto.getParents().get(0);
+        ParentDto parentResult2 = dto.getParents().get(1);
+
+        assertThat(parentResult1).isNotNull();
+        assertThat(parentResult1.getName()).isNotBlank();
+        assertThat(parentResult1.getSurname()).isNotBlank();
+        assertThat(parentResult1.getAddress()).isNotBlank();
+
+        assertThat(parentResult2).isNotNull();
+        assertThat(parentResult2.getName()).isNotBlank();
+        assertThat(parentResult2.getSurname()).isNotBlank();
+        assertThat(parentResult2.getAddress()).isNotBlank();
+
+        List<ApplicationDocumentDto> documents = dto.getDocuments();
+        assertThat(documents).isNotEmpty().hasSize(1);
+        ApplicationDocumentDto document = documents.get(0);
+        assertThat(document).isNotNull();
+        assertThat(document.getFileSize()).isNotBlank().endsWith("bytes");
+        assertThat(document.getFilename()).isNotBlank().endsWith(".txt");
+        assertThat(document.getId()).isNotBlank();
     }
 
 }

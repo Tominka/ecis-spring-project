@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -17,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import cz.ecis.core.exception.DocumentCreateException;
+import cz.ecis.core.exception.EntityNotExistsException;
 import cz.ecis.core.security.CampSecurityContext;
 import cz.ecis.core.settings.EcisStorageSettings;
 import cz.ecis.db.ent.ApplicationDocumentEnt;
@@ -67,7 +69,19 @@ public class ApplicationService {
     }
 
     @Transactional
-    public ApplicationEnt createApplicationEnt(ApplicationCreateDto createDto) {
+    public ApplicationDto getApplicationById(Long id) {
+        return this.applicationMapper.toDto(this.getById(id));
+    }
+
+    @Transactional
+    public ApplicationEnt getById(Long id) {
+        Long campId = CampSecurityContext.getCampId();
+        return this.applicationRepository.findByIdAndCampId(id, campId)
+            .orElseThrow(() -> new EntityNotExistsException(Map.of("id", id.toString())));
+    }
+
+    @Transactional
+    private ApplicationEnt createApplicationEnt(ApplicationCreateDto createDto) {
 
         CampEnt camp = CampSecurityContext.getCamp();
         ChildEnt child = childService.findChildOrCreate(createDto.getChild());
@@ -104,7 +118,7 @@ public class ApplicationService {
         return ent;
     }
 
-    public ApplicationDocumentEnt createDocument(ApplicationDocumentCreateDto dto, ApplicationEnt application) throws IOException {
+    private ApplicationDocumentEnt createDocument(ApplicationDocumentCreateDto dto, ApplicationEnt application) throws IOException {
         byte[] file = dto.getData();
         String extension = FilenameUtils.getExtension(dto.getFilename());
         LkpDocumentTypeEnt type = this.lkpDocumentTypeRepository.findByExtensionIgnoreCaseValid(extension);

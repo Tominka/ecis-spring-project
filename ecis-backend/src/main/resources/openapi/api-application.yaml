@@ -85,6 +85,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorDto"
+  /application/{id}:
+    get:
+      tags:
+        - Application
+      operationId: getApplicationById
+      security:
+        - bearerAuth: []
+        - campContext: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Fetched application by id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
 components:
   schemas:
     ApplicationOverviewDto:

@@ -31,6 +31,14 @@ public class ApplicationController implements ApplicationApiInterface {
 
     @Override
     @CampSecured
+    public ResponseEntity<ApplicationDto> getApplicationById(Long id) {
+        return ResponseEntity.ok(
+            this.applicationService.getApplicationById(id)
+        );
+    }
+
+    @Override
+    @CampSecured
     public ResponseEntity<ApplicationDto> createApplication(ApplicationCreateDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
             this.applicationService.createApplication(dto)

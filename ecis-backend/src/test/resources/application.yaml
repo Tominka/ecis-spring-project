@@ -1,3 +1,6 @@
+server:
+  port: 8082
+
 spring:
   application:
     name: ECIS backend
@@ -23,11 +26,13 @@ spring:
     properties:
       hibernate:
         format_sql: false
-    show-sql: true
+    show-sql: false
   main:
     log-startup-info: true
-server:
-  port: 8082
+
+springdoc:
+  api-docs:
+    enabled: false
 
 ecis:
   app:

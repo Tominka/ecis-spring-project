@@ -12,6 +12,10 @@ public class EntityNotExistsException extends RuntimeException {
 
     private final Map<String, String> map;
 
+    public EntityNotExistsException(Map<String, String> map) {
+        this("Record not found", map);
+    }
+
     public EntityNotExistsException(String message) {
         this(message, Map.of());
     }

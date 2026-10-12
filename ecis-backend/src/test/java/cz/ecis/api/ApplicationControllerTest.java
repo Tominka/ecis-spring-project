@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 
 import cz.ecis.config.EcisIntegrationTestClient;
@@ -117,7 +118,7 @@ class ApplicationControllerTest extends EcisIntegrationTestClient {
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     void testGetApplicationById() throws Exception {
 
         ApplicationDto createdApplication = this.createdApplications.get(0);
@@ -160,6 +161,23 @@ class ApplicationControllerTest extends EcisIntegrationTestClient {
         assertThat(document.getFileSize()).isNotBlank().endsWith("bytes");
         assertThat(document.getFilename()).isNotBlank().endsWith(".txt");
         assertThat(document.getId()).isNotBlank();
+    }
+
+    @Test
+    @Order(4)
+    void testGetApplicationDocumentById() throws Exception {
+
+        ApplicationDto createdApplication = this.createdApplications.get(0);
+
+        this.addUrlParam("id", createdApplication.getId());
+        ApplicationDocumentDto document = createdApplication.getDocuments().get(0);
+        this.addUrlParam("documentId", document.getId());
+
+        Resource resource =  this.withHeader("X-Camp-Id", "1")
+            .runGet(ApplicationController.PATH_GET_APPLICATION_DOCUMENT_CONTENT_BY_ID, "test", Resource.class);
+
+        assertThat(resource.getFilename()).isEqualTo("neco.txt");
+        assertThat(resource.getContentAsByteArray()).isEqualTo(new byte[] {1,2,3,4,5});
     }
 
 }

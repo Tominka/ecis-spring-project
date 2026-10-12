@@ -1,5 +1,6 @@
 package cz.ecis.utils;
 
+import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
@@ -39,15 +40,21 @@ public class ExceptionHandlerUtils {
     }
 
     public static ErrorDto handleError(HttpStatus status, String message) {
+        LOGGER.error("API returned error status {} - {}", status.name(), message);
         return handleError(status, message, null);
     }
 
-    public static ErrorDto handleError(HttpStatus status, Throwable e, Map<String, String> errors) {
+    public static ErrorDto handleError(HttpStatus status, Throwable e, String message) {
+        LOGGER.error("Exception handled", e);
+        return handleError(status, message);
+    }
+
+    public static ErrorDto handleError(HttpStatus status, Throwable e, Map<String, Serializable> errors) {
         LOGGER.error("Exception handled", e);
         return handleError(status, e.getMessage(), errors);
     }
 
-    public static ErrorDto handleError(HttpStatus status, String message, Map<String, String> errors) {
+    public static ErrorDto handleError(HttpStatus status, String message, Map<String, Serializable> errors) {
         return ErrorDto.builder()
             .status(status.value())
             .message(message)

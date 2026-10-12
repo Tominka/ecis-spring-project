@@ -1,5 +1,6 @@
 package cz.ecis.core.exception;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ public class EntityDuplicationException extends EcisRuntimeException {
 	
 	private final UUID id;
 
-    public EntityDuplicationException(UUID id, String message, Map<String, String> fieldErrors) {
+    public EntityDuplicationException(UUID id, String message, Map<String, Serializable> fieldErrors) {
         super(message, fieldErrors, HttpStatus.CONFLICT);
         this.id = id;
     }

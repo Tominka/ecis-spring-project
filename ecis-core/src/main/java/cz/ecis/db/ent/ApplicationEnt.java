@@ -8,6 +8,7 @@ import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.hibernate.envers.RelationTargetAuditMode;
 
+import cz.ecis.core.ent.ICampEntity;
 import cz.ecis.core.ent.VersionAwareEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -27,7 +28,7 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @Audited
-public class ApplicationEnt extends VersionAwareEntity<Long> {
+public class ApplicationEnt extends VersionAwareEntity<Long> implements ICampEntity {
 
     @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @ManyToOne(fetch = FetchType.EAGER)

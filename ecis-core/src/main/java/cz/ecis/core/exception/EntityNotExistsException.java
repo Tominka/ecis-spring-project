@@ -10,9 +10,9 @@ public class EntityNotExistsException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-    private final Map<String, String> map;
+    private final Map<String, Serializable> map;
 
-    public EntityNotExistsException(Map<String, String> map) {
+    public EntityNotExistsException(Map<String, Serializable> map) {
         this("Record not found", map);
     }
 
@@ -21,10 +21,10 @@ public class EntityNotExistsException extends RuntimeException {
     }
 
     public EntityNotExistsException(String message, Serializable id) {
-        this(message, Map.of("id", id == null ? null : id.toString()));
+        this(message, Map.of("id", id));
     }
 
-    public EntityNotExistsException(String message, Map<String, String> map) {
+    public EntityNotExistsException(String message, Map<String, Serializable> map) {
         super(message);
         this.map = map;
     }

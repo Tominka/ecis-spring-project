@@ -1,5 +1,6 @@
 package cz.ecis.core.model;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import lombok.Builder;
@@ -13,6 +14,6 @@ public class ErrorDto {
 
     private int status;
     private String message;
-    private Map<String, String> errors;
+    private Map<String, Serializable> errors;
     private String timestamp;
 }

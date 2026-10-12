@@ -17,8 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import cz.ecis.core.exception.DocumentCreateException;
-import cz.ecis.core.exception.EntityNotExistsException;
+import cz.ecis.core.exception.DocumentException;
 import cz.ecis.core.security.CampSecurityContext;
 import cz.ecis.core.settings.EcisStorageSettings;
 import cz.ecis.db.ent.ApplicationDocumentEnt;
@@ -74,10 +73,22 @@ public class ApplicationService {
     }
 
     @Transactional
-    public ApplicationEnt getById(Long id) {
+    public ApplicationContentResult getApplicationDocumentResult(Long id, UUID documentId) {
         Long campId = CampSecurityContext.getCampId();
-        return this.applicationRepository.findByIdAndCampId(id, campId)
-            .orElseThrow(() -> new EntityNotExistsException(Map.of("id", id.toString())));
+        ApplicationDocumentEnt document = this.applicationDocumentRepository.findByIdAndApplicationIdAndCampId(documentId, id, campId);
+        byte[] data = {};
+        try {
+            data = Files.readAllBytes(Path.of(document.getFileLocation()));
+        } catch (IOException | OutOfMemoryError e) {
+            LOGGER.error("Error during file read", e);
+            throw new DocumentException("Error during document read");
+        }
+        return new ApplicationContentResult(document.getFilename(), data);
+    };
+
+    private ApplicationEnt getById(Long id) {
+        Long campId = CampSecurityContext.getCampId();
+        return this.applicationRepository.findByIdAndCampId(id, campId);
     }
 
     @Transactional
@@ -108,7 +119,7 @@ public class ApplicationService {
                 documents.add(this.createDocument(dto, ent));
             } catch (IOException e) {
                 LOGGER.error("Error during creating document {}", dto.getFilename(), e);
-                throw new DocumentCreateException("Error during creating document: " + dto.getFilename());
+                throw new DocumentException("Error during creating document: " + dto.getFilename());
             }
         }
         documents = applicationDocumentRepository.saveAll(documents);
@@ -143,4 +154,6 @@ public class ApplicationService {
 
         return ent;
     }
+
+    public record ApplicationContentResult(String filename, byte[] data) {}
 }

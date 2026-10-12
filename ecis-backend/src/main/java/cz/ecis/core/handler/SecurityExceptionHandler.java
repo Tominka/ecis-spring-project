@@ -1,5 +1,6 @@
 package cz.ecis.core.handler;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class SecurityExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @Hidden
     public ErrorDto handleBadCredentials(Exception ex) {
-        Map<String, String> errors = new HashMap<>();
+        Map<String, Serializable> errors = new HashMap<>();
         // TODO: check if EntityNotExistsException is reachable here
         switch (ex) {
             case EntityNotExistsException ene ->

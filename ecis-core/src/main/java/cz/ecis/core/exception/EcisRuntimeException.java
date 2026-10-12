@@ -1,5 +1,6 @@
 package cz.ecis.core.exception;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,14 +13,14 @@ public class EcisRuntimeException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	protected final Map<String, String> fieldErrors;
+	private final Map<String, Serializable> fieldErrors;
     private final HttpStatus status;
 
     public EcisRuntimeException(String message, HttpStatus status) {
         this(message, new HashMap<>(), status);
     }
 
-    public EcisRuntimeException(String message, Map<String, String> fieldErrors, HttpStatus status) {
+    public EcisRuntimeException(String message, Map<String, Serializable> fieldErrors, HttpStatus status) {
         super(message);
         this.fieldErrors = fieldErrors;
         this.status = status;

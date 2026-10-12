@@ -7,6 +7,10 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
@@ -150,16 +154,57 @@ public abstract class EcisIntegrationTest {
     }
 
     private <T> T readResult(MvcResult result, JavaType resultType) throws JacksonException, UnsupportedEncodingException {
+
         if (this.expectedEmptyContent) {
             this.expectedEmptyContent = false;
             return null;
         }
 
+        Class<?> rawClass = resultType.getRawClass();
+
+        if (byte[].class.equals(rawClass)) {
+            return (T) result.getResponse().getContentAsByteArray();
+        }
+
+        if (Resource.class.isAssignableFrom(rawClass)) {
+            byte[] content = result.getResponse().getContentAsByteArray();
+
+            if (content.length == 0) {
+                return null;
+            }
+
+            String contentDisposition = result.getResponse().getHeader(HttpHeaders.CONTENT_DISPOSITION);
+            String filename = null;
+            if (contentDisposition != null) {
+                filename = ContentDisposition.parse(contentDisposition).getFilename();
+                if (filename == null) {
+                    int filenameStart = contentDisposition.indexOf("filename=\"");
+                    if (filenameStart >= 0) {
+                        filenameStart += "filename=\"".length();
+                        int filenameEnd = contentDisposition.indexOf('"', filenameStart);
+                        if (filenameEnd >= 0) {
+                            filename = contentDisposition.substring(filenameStart, filenameEnd);
+                        }
+                    }
+                }
+            }
+
+            String resourceFilename = filename;
+            return (T) new ByteArrayResource(content) {
+                @Override
+                public String getFilename() {
+                    return resourceFilename;
+                }
+            };
+        }
+
         String content = result.getResponse().getContentAsString();
+
         if (content.isBlank()) {
             return null;
         }
-        if (String.class.equals(resultType.getRawClass())) {
+
+        if (String.class.equals(rawClass)) {
             return om.convertValue(content, resultType);
         }
 

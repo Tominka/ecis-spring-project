@@ -1,5 +1,6 @@
 package cz.ecis.core.handler;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import cz.ecis.core.exception.CampResolveException;
-import cz.ecis.core.exception.DocumentCreateException;
+import cz.ecis.core.exception.DocumentException;
 import cz.ecis.core.exception.EcisRuntimeException;
 import cz.ecis.core.exception.EntityNotExistsException;
 import cz.ecis.core.model.ErrorDto;
@@ -51,11 +52,12 @@ public class GlobalExceptionHandler {
     )
     public ErrorDto handleAllExceptions(Exception ex) {
         String message = DEFAULT_UNKNOWN_ERROR;
-        if (ex instanceof DocumentCreateException) {
+        if (ex instanceof DocumentException) {
             message = ex.getMessage();
         }
         return ExceptionHandlerUtils.handleError(
             HttpStatus.INTERNAL_SERVER_ERROR,
+            ex,
             message
         );
     }
@@ -68,7 +70,7 @@ public class GlobalExceptionHandler {
     @Hidden
     @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
     public ErrorDto handleValidation(Exception ex) {
-        Map<String, String> errors = new HashMap<>();
+        Map<String, Serializable> errors = new HashMap<>();
 
         if (ex instanceof BindException be) {
             be.getBindingResult().getFieldErrors()
@@ -92,7 +94,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @Hidden
     public ErrorDto handleEntityNotFound(Exception ex) {
-        Map<String, String> errors = new HashMap<>();
+        Map<String, Serializable> errors = new HashMap<>();
         switch (ex) {
             case EntityNotExistsException ene ->
                 errors = ene.getMap();
@@ -115,7 +117,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDto handleHttpMessageConversion(HttpMessageConversionException ex) {
 
-        Map<String, String> errors = new HashMap<>();
+        Map<String, Serializable> errors = new HashMap<>();
 
         Throwable cause = ExceptionHandlerUtils.rootCause(ex); // <-- důležité
 

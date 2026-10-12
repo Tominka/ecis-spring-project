@@ -1,8 +1,16 @@
 package cz.ecis.api;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
 
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +20,7 @@ import cz.ecis.model.dto.ApplicationCreateDto;
 import cz.ecis.model.dto.ApplicationDto;
 import cz.ecis.model.dto.ApplicationOverviewDto;
 import cz.ecis.service.ApplicationService;
+import cz.ecis.service.ApplicationService.ApplicationContentResult;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -43,5 +52,25 @@ public class ApplicationController implements ApplicationApiInterface {
         return ResponseEntity.status(HttpStatus.CREATED).body(
             this.applicationService.createApplication(dto)
         );
+    }
+
+    @Override
+    public ResponseEntity<Resource> getApplicationDocumentContentById(Long id, UUID documentId) {
+        ApplicationContentResult result = this.applicationService.getApplicationDocumentResult(id, documentId);
+
+        MediaType mediaType = MediaTypeFactory.getMediaType(result.filename())
+            .orElse(MediaType.APPLICATION_OCTET_STREAM);
+
+        String contentDisposition = ContentDisposition.attachment()
+            .filename(result.filename(), StandardCharsets.UTF_8)
+            .build()
+            .toString();
+
+        return ResponseEntity.ok()
+            .contentType(mediaType)
+            .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+            .contentLength(result.data().length)
+            .body(new ByteArrayResource(result.data()));
+
     }
 }

@@ -16,7 +16,7 @@ public interface SecMapper {
     @Mapping(source = "twoFaEnabled", target = "is2FaEnabled")
     UserCredentialsDto userToCredentialsDto(UserEnt user);
 
-    @Mapping(source = "campId", target = "selectedCampId")
+    @Mapping(source = "camp.id", target = "selectedCampId")
     UserSettingsDto userSetingsToDto(UserSettingsEnt ent);
 
 }

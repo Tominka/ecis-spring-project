@@ -30,6 +30,10 @@ public class EnvironmentContext {
         );
     }
 
+    public boolean isDev() {
+        return EnvTypeEnum.DEV.equals(this.appContext.type());
+    }
+
     private EnvTypeEnum getEnvType() {
         Set<String> profiles = Set.of(this.environment.getActiveProfiles());
 

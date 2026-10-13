@@ -6,6 +6,9 @@ import lombok.Setter;
 import cz.ecis.core.ent.VersionAwareEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,6 +29,7 @@ public class UserSettingsEnt extends VersionAwareEntity<Long> {
     @Column(name = "default_page_after_refresh")
     private boolean defaultPageAfterRefresh;
 
-    @Column(name = "id_camp")
-    private Integer campId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_camp", referencedColumnName = "id", updatable = true, nullable = true)
+    private CampEnt camp;
 }

@@ -315,6 +315,36 @@
 							</configOptions>
 						</configuration>
 					</execution>
+					<execution>
+						<id>user</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/openapi/user.yaml</inputSpec>
+							<generatorName>spring</generatorName>
+							<apiPackage>cz.ecis.api</apiPackage>
+							<modelPackage>cz.ecis.model.dto</modelPackage>
+							<apiNameSuffix>ApiInterface</apiNameSuffix>
+							<importMappings>
+								CampDto=cz.ecis.model.dto.CampDto,
+								LovDto=cz.ecis.core.model.LovDto,
+								ErrorDto=cz.ecis.core.model.ErrorDto
+							</importMappings>
+							<typeMappings>
+								CampDto=cz.ecis.model.dto.CampDto,
+								LovDto=cz.ecis.core.model.LovDto,
+								ErrorDto=cz.ecis.core.model.ErrorDto
+							</typeMappings>
+							<configOptions>
+								<useSpringBoot4>true</useSpringBoot4>
+								<interfaceOnly>true</interfaceOnly>
+								<useBeanValidation>true</useBeanValidation>
+								<delegatePattern>false</delegatePattern>
+								<useJakartaEe>true</useJakartaEe>
+							</configOptions>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>

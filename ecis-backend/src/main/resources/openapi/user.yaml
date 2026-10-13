@@ -1,0 +1,203 @@
+openapi: 3.0.1
+info:
+  title: User API
+  description: API definiton for users
+  version: 1.0.0
+tags:
+  -
+    name: User
+    description: APIs for managing users in system
+servers:
+  - url: /api/v1
+    description: Local development server
+
+paths:
+  /user/camp:
+    get:
+      tags:
+        - User
+      operationId: getUserCamps
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Fetched user camps
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "./camp.yaml#/components/schemas/CampDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+  /user/camp/lov:
+    get:
+      tags:
+        - User
+      operationId: getUserCampsLov
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Fetched camps in lov
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LovDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+  /user/settings/camp:
+    patch:
+      tags:
+        - User
+      operationId: selectUserCamp
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCampChangeDto"
+      responses:
+        "204":
+          description: Camp selected
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+  /user/duty:
+    get:
+      tags:
+        - User
+      operationId: getUserDuties
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Fetched user duties
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDutyDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
+components:
+  schemas:
+    UserCampChangeDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+    LovDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        label:
+          type: string
+    UserDutyDto:
+      type: object
+
+    ErrorDto:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+        timestamp:
+          type: string
+
+  parameters:
+    CampIdParam:
+      name: campId
+      description: Camp Id
+      schema:
+        format: int64
+        type: integer
+      in: path
+      required: true
+
+  securitySchemes:
+    campContext:
+      type: apiKey
+      in: header
+      name: X-Camp-Id
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

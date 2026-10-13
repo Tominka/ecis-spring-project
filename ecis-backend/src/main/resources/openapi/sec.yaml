@@ -319,9 +319,6 @@ components:
     UserSettingsDto:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
         defaultPage:
           type: string
         defaultPageAfterLogin:

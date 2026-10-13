@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import cz.ecis.config.EcisIntegrationTestClient;
-import cz.ecis.core.model.LovDto;
 import cz.ecis.model.dto.CampDto;
 import tools.jackson.core.type.TypeReference;
 
@@ -23,26 +22,6 @@ class CampControllerTest extends EcisIntegrationTestClient {
 
     @Test
     @Order(1)
-    void testGetAllCamps() throws Exception {
-
-        List<CampDto> camps = this.runGet(CampController.PATH_GET_ALL_CAMPS, "test", new TypeReference<List<CampDto>>() {});
-
-        assertThat(camps).hasSize(1);
-        assertThat(camps.get(0).getId()).isEqualTo(1);
-    }
-
-    @Test
-    @Order(2)
-    void testGetAllCampsLov() throws Exception {
-
-        List<LovDto> camps = this.runGet(CampController.PATH_GET_ALL_CAMPS_LOV, "test", new TypeReference<List<LovDto>>() {});
-
-        assertThat(camps).hasSize(1);
-        assertThat(camps.get(0).getId()).isEqualTo(1);
-    }
-
-    @Test
-    @Order(3)
     void testGetCampById() throws Exception {
 
         this.addUrlParam("id", 1);
@@ -53,7 +32,7 @@ class CampControllerTest extends EcisIntegrationTestClient {
     }
 
     @Test
-    @Order(4)
+    @Order(2)
     void testCreateNewCamp() throws Exception {
 
         LocalDate dateFrom = LocalDate.now(ZoneId.systemDefault());
@@ -77,13 +56,13 @@ class CampControllerTest extends EcisIntegrationTestClient {
         assertThat(camp.getEnabled()).isTrue();
         assertThat(camp.getCreatedBy()).isEqualTo("test");
 
-        List<CampDto> camps = this.runGet(CampController.PATH_GET_ALL_CAMPS, "test", new TypeReference<List<CampDto>>() {});
+        List<CampDto> camps = this.runGet(UserController.PATH_GET_USER_CAMPS, "test", new TypeReference<List<CampDto>>() {});
 
         assertThat(camps).hasSize(2);
     }
 
     @Test
-    @Order(5)
+    @Order(3)
     void testUpdateCamp() throws Exception {
 
         LocalDate dateFrom = LocalDate.now(ZoneId.systemDefault());

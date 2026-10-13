@@ -1,11 +1,13 @@
 package cz.ecis.core.security;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import cz.ecis.core.exception.EntityNotExistsException;
 import cz.ecis.db.ent.CampEnt;
 import cz.ecis.db.ent.CampRoleEnt;
 import cz.ecis.db.ent.RoleEnt;
@@ -65,5 +67,16 @@ public class EcisUserDetailsService implements UserDetailsService {
         ent.setRole(role);
 
         return this.campRoleRepository.save(ent);
+    }
+
+    public void selectUserCamp(Long campId) {
+        CampEnt camp = null;
+        if (campId != null) {
+            camp = this.campRepository.findById(campId)
+            .orElseThrow(() -> new EntityNotExistsException(Map.of("id", campId)));
+        }
+        UserEnt user = SecurityUtils.getUserEnt();
+        user.getSettings().setCamp(camp);
+        this.userRepository.save(user);
     }
 }

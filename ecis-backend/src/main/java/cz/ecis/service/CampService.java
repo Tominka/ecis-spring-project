@@ -28,13 +28,13 @@ public class CampService {
 
     private final EcisUserDetailsService ecisUserDetailsService;
 
-    public List<CampDto> getAll() {
+    public List<CampDto> getUserCamps() {
         return SecurityUtils.getUserCamps().stream()
             .map(this.campMapper::toDto)
             .toList();
     }
 
-    public List<LovDto> getAllLov() {
+    public List<LovDto> getUserCampsLov() {
         return SecurityUtils.getUserCamps().stream()
             .map(this.lovDtoMapper::toLovDto)
             .toList();

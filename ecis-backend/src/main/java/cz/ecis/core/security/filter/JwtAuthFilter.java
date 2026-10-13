@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import cz.ecis.core.EcisContext;
+import cz.ecis.core.EnvironmentContext;
 import cz.ecis.core.handler.LoginExceptionHandler;
 import cz.ecis.core.security.EcisUserDetails;
 import cz.ecis.core.security.JwtAuthenticationToken;
@@ -37,11 +38,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final LoginExceptionHandler loginExceptionHandler;
+    private final EnvironmentContext environment;
 
     private static final String TOKEN_PREFIX = "Bearer ";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // System.out.println(request.getMethod());
+        // if (this.environment.isDev() && request.getMethod().equals("OPTIONS")) {
+        //     filterChain.doFilter(request, response);
+        //     return;
+        // }
 
         String authHeader = request.getHeader("Authorization");
 

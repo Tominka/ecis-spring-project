@@ -2,6 +2,7 @@ package cz.ecis.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.Order;
@@ -12,6 +13,7 @@ import cz.ecis.config.liquibase.TestLiquibaseAfter;
 import cz.ecis.config.liquibase.TestLiquibaseBefore;
 import cz.ecis.core.model.LovDto;
 import cz.ecis.model.dto.ChildDto;
+import cz.ecis.model.dto.ChildFilterDto;
 import tools.jackson.core.type.TypeReference;
 
 @TestLiquibaseBefore(changeLog = "db/changelog/test-child-parent-application.xml", dataSourceId = "liquibaseDataSource")
@@ -28,7 +30,7 @@ class ChildControllerTest extends EcisIntegrationTestClient {
             new TypeReference<List<ChildDto>>() {}
         );
 
-        assertThat(children).singleElement().satisfies(child -> {
+        assertThat(children.get(0)).satisfies(child -> {
             assertThat(child.getId()).isEqualTo(1);
             assertThat(child.getName()).isEqualTo("Test");
             assertThat(child.getSurname()).isEqualTo("Child");
@@ -46,9 +48,81 @@ class ChildControllerTest extends EcisIntegrationTestClient {
             new TypeReference<List<LovDto>>() {}
         );
 
-        assertThat(children).singleElement().satisfies(child -> {
+        assertThat(children.get(0)).satisfies(child -> {
             assertThat(child.getId()).isEqualTo(1);
             assertThat(child.getLabel()).contains("Test", "Child");
         });
+    }
+
+    @Test
+    @Order(3)
+    void testSearchChildren() throws Exception {
+
+        ChildFilterDto filter = new ChildFilterDto();
+
+        List<ChildDto> children = this.withHeader("X-Camp-Id", "1").runPost(
+            ChildController.PATH_SEARCH_CHILDREN,
+            "test", filter,
+            new TypeReference<List<ChildDto>>() {}
+        );
+
+        assertThat(children).isNotNull().hasSize(2);
+
+        filter.name("Test");
+        children = this.withHeader("X-Camp-Id", "1").runPost(
+            ChildController.PATH_SEARCH_CHILDREN,
+            "test", filter,
+            new TypeReference<List<ChildDto>>() {}
+        );
+
+        assertThat(children).isNotNull().hasSize(2);
+
+        filter.name("Test2");
+        children = this.withHeader("X-Camp-Id", "1").runPost(
+            ChildController.PATH_SEARCH_CHILDREN,
+            "test", filter,
+            new TypeReference<List<ChildDto>>() {}
+        );
+
+        assertThat(children).isNotNull().hasSize(1);
+        ChildDto child = children.get(0);
+        assertThat(child.getId()).isEqualTo(2);
+        assertThat(child.getName()).isEqualTo("Test2");
+
+        filter.name(null).surname("Child");
+        children = this.withHeader("X-Camp-Id", "1").runPost(
+            ChildController.PATH_SEARCH_CHILDREN,
+            "test", filter,
+            new TypeReference<List<ChildDto>>() {}
+        );
+
+        assertThat(children).isNotNull().hasSize(1);
+        child = children.get(0);
+        assertThat(child.getId()).isEqualTo(1);
+        assertThat(child.getName()).isEqualTo("Test");
+
+        filter.surname(null).birthdate(LocalDate.of(2018, 1, 3));
+        children = this.withHeader("X-Camp-Id", "1").runPost(
+            ChildController.PATH_SEARCH_CHILDREN,
+            "test", filter,
+            new TypeReference<List<ChildDto>>() {}
+        );
+
+        assertThat(children).isNotNull().hasSize(1);
+        child = children.get(0);
+        assertThat(child.getId()).isEqualTo(2);
+        assertThat(child.getName()).isEqualTo("Test2");
+
+        filter.birthdate(null).address("Test address 2");
+        children = this.withHeader("X-Camp-Id", "1").runPost(
+            ChildController.PATH_SEARCH_CHILDREN,
+            "test", filter,
+            new TypeReference<List<ChildDto>>() {}
+        );
+
+        assertThat(children).isNotNull().hasSize(1);
+        child = children.get(0);
+        assertThat(child.getId()).isEqualTo(2);
+        assertThat(child.getName()).isEqualTo("Test2");
     }
 }

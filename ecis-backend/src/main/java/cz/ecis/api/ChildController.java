@@ -3,6 +3,7 @@ package cz.ecis.api;
 
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +12,7 @@ import cz.ecis.core.model.LovDto;
 import cz.ecis.core.security.EcisRoleEnum;
 import cz.ecis.core.security.annotation.CampSecured;
 import cz.ecis.model.dto.ChildDto;
+import cz.ecis.model.dto.ChildFilterDto;
 import cz.ecis.service.ChildService;
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +27,12 @@ public class ChildController implements ChildApiInterface {
     @CampSecured(roles = {EcisRoleEnum.CHILDREN_READ})
     public ResponseEntity<List<ChildDto>> getAllChildren() {
         return ResponseEntity.ok(this.childService.getAll());
+    }
+
+    @Override
+    @CampSecured(roles = {EcisRoleEnum.CHILDREN_READ})
+    public ResponseEntity<List<ChildDto>> searchChildren(@Nullable ChildFilterDto filter) {
+        return ResponseEntity.ok(this.childService.search(filter));
     }
 
     @Override

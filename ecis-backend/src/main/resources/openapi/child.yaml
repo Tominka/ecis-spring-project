@@ -47,6 +47,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorDto"
+  /child/search:
+    post:
+      tags:
+        - Children
+      operationId: searchChildren
+      security:
+        - bearerAuth: []
+        - campContext: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChildFilterDto"
+      responses:
+        "200":
+          description: Fetched children in specified camp by criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChildDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
   /child/lov:
     get:
       tags:
@@ -84,6 +124,21 @@ paths:
                 $ref: "#/components/schemas/ErrorDto"
 components:
   schemas:
+    ChildFilterDto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        surname:
+          type: string
+          maxLength: 255
+        address:
+          type: string
+          maxLength: 510
+        birthdate:
+          type: string
+          format: date
     ChildDto:
       type: object
       required:

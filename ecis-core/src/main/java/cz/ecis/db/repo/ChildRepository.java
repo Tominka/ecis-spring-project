@@ -4,11 +4,17 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+
+import com.querydsl.core.types.Predicate;
+
 import cz.ecis.core.repo.VersionAwareRepository;
 import cz.ecis.db.ent.ChildEnt;
 import cz.ecis.utils.CrudUtils;
 
-public interface ChildRepository extends VersionAwareRepository<ChildEnt, Long> {
+public interface ChildRepository extends VersionAwareRepository<ChildEnt, Long>, QuerydslPredicateExecutor<ChildEnt> {
+
+    List<ChildEnt> findAll(Predicate predicate);
 
     List<ChildEnt> findAllByApplicationsCampId(Long campId);
 

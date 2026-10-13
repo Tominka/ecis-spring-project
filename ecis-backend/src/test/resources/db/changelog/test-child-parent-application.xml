@@ -16,6 +16,14 @@
             <column name="birthdate" value="2018-01-02" />
             <column name="created_by" value="SYSTEM" />
         </insert>
+        <insert schemaName="ecis" tableName="child">
+            <column name="id" valueNumeric="2" />
+            <column name="name" value="Test2" />
+            <column name="surname" value="Child2" />
+            <column name="address" value="Test address 2" />
+            <column name="birthdate" value="2018-01-03" />
+            <column name="created_by" value="SYSTEM" />
+        </insert>
         <insert schemaName="ecis" tableName="parent">
             <column name="id" valueNumeric="1" />
             <column name="name" value="Test" />
@@ -28,6 +36,12 @@
         <insert schemaName="ecis" tableName="application">
             <column name="id" valueNumeric="1" />
             <column name="id_child" valueNumeric="1" />
+            <column name="id_camp" valueNumeric="1" />
+            <column name="created_by" value="SYSTEM" />
+        </insert>
+        <insert schemaName="ecis" tableName="application">
+            <column name="id" valueNumeric="2" />
+            <column name="id_child" valueNumeric="2" />
             <column name="id_camp" valueNumeric="1" />
             <column name="created_by" value="SYSTEM" />
         </insert>

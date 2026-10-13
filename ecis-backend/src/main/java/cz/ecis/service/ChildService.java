@@ -2,15 +2,20 @@ package cz.ecis.service;
 
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
+
+import com.querydsl.core.types.Predicate;
 
 import cz.ecis.core.mapper.LovDtoMapper;
 import cz.ecis.core.model.LovDto;
 import cz.ecis.core.security.CampSecurityContext;
+import cz.ecis.criteria.ChildCriteria;
 import cz.ecis.db.ent.ChildEnt;
 import cz.ecis.db.repo.ChildRepository;
 import cz.ecis.mapper.ChildMapper;
 import cz.ecis.model.dto.ChildDto;
+import cz.ecis.model.dto.ChildFilterDto;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -27,6 +32,14 @@ public class ChildService {
         return this.childRepository.findAllByApplicationsCampId(camp).stream()
             .map(this.childMapper::toDto)
             .toList();
+    }
+
+    public List<ChildDto> search(@Nullable ChildFilterDto filter) {
+        Long camp = CampSecurityContext.getCampId();
+            Predicate criteria = ChildCriteria.byFilter(filter, camp);
+            return this.childRepository.findAll(criteria).stream()
+                .map(this.childMapper::toDto)
+                .toList();
     }
 
     public List<LovDto> getAllLov() {

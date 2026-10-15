@@ -18,6 +18,7 @@ public class AuditorConfig {
 
 	@Bean
 	IEcisRevisionResolver revisionResolver() {
+		final String defaultAuditor = ecisAuditSettings.defaultAuditor();
 		return new IEcisRevisionResolver() {
 
 	        @Override
@@ -29,7 +30,7 @@ public class AuditorConfig {
 	                return auth.getName();
 	            }
 
-	            return ecisAuditSettings.defaultAuditor();
+			    return defaultAuditor;
 	        }
 	        
 	        @Override

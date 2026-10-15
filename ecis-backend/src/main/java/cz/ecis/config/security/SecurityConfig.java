@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
     private final EcisUserDetailsService userDetailsService;
+    private final AccountStatusUserDetailsChecker userDetailsChecker;
     private final JwtAuthFilter jwtAuthFilter;
     private final LoginExceptionHandler loginExceptionHandler;
     private final RequestLoggingFilter requestLoggingFilter;
@@ -76,7 +78,7 @@ public class SecurityConfig {
 
     @Bean
     AuthenticationProvider jwtAuthenticationProvider() {
-        return new JwtAuthenticationProvider(userDetailsService);
+        return new JwtAuthenticationProvider(userDetailsService, userDetailsChecker);
     }
 
     @Bean

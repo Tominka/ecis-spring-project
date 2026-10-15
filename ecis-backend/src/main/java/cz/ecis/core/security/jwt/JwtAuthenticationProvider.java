@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     private final UserDetailsService userDetailsService;
-    private final AccountStatusUserDetailsChecker userDetailsChecker = new AccountStatusUserDetailsChecker();
+    private final AccountStatusUserDetailsChecker userDetailsChecker;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {

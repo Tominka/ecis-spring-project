@@ -36,6 +36,7 @@ import cz.ecis.mapper.SecMapper;
 import cz.ecis.model.dto.LoginRequestDto;
 import cz.ecis.model.dto.LoginResponseDto;
 import cz.ecis.model.dto.RefreshTokenRequestDto;
+import cz.ecis.model.dto.RequestPasswordResetDto;
 import cz.ecis.model.dto.TwoFaCodeDto;
 import cz.ecis.model.dto.TwoFaQrCodeDto;
 import cz.ecis.model.dto.UserCredentialsDto;
@@ -57,7 +58,7 @@ public class SecService {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final PasswordEncoder passwordEncoder;
-    private final AccountStatusUserDetailsChecker userDetailsChecker = new AccountStatusUserDetailsChecker();
+    private final AccountStatusUserDetailsChecker userDetailsChecker;
     private final EcisUserDetailsService userDetailsService;
     private final LoginService loginService;
     private final JwtService jwtService;

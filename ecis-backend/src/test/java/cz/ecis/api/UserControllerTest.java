@@ -47,6 +47,118 @@ class UserControllerTest extends EcisIntegrationTestClient {
 
     @Test
     @Order(3)
+    void testGetUserDutiesReturnsOk() throws Exception {
+        Object duties = this.runGet(UserController.PATH_GET_USER_DUTIES, "test", Object.class);
+
+        assertThat(duties).isNotNull();
+    }
+
+    @Test
+    @Order(4)
+    void testGetUserCampsWithoutAuthenticationReturnsUnauthorized() throws Exception {
+        this.withExpectedStatus(HttpStatus.UNAUTHORIZED).runGet(
+            UserController.PATH_GET_USER_CAMPS,
+            null,
+            Object.class
+        );
+    }
+
+    @Test
+    @Order(5)
+    void testOtherUserWithoutCampsGetsEmptyList() throws Exception {
+        LoginResponseDto login = this.runPost(
+            SecController.PATH_LOGIN,
+            null,
+            new LoginRequestDto("other", "test"),
+            LoginResponseDto.class
+        );
+        this.withUserToken("other", "Bearer " + login.getToken());
+
+        List<CampDto> camps = this.runGet(
+            UserController.PATH_GET_USER_CAMPS,
+            "other",
+            new TypeReference<List<CampDto>>() {}
+        );
+        assertThat(camps).isEmpty();
+    }
+
+    @Test
+    @Order(6)
+    void testGetUserDutiesWithoutAuthenticationReturnsUnauthorized() throws Exception {
+        this.withExpectedStatus(HttpStatus.UNAUTHORIZED).runGet(
+            UserController.PATH_GET_USER_DUTIES,
+            null,
+            Object.class
+        );
+    }
+
+    @Test
+    @Order(7)
+    void testSelectUserCampAndClearSelection() throws Exception {
+        UserCampChangeDto request = new UserCampChangeDto();
+        request.setId(1L);
+
+        this.withExpectedEmptyContent().runPatch(
+            UserController.PATH_SELECT_USER_CAMP,
+            "test",
+            request,
+            Object.class
+        );
+        assertThat(this.userRepository.findById(1L).orElseThrow().getSettings().getCamp().getId())
+            .isEqualTo(1L);
+
+        request.setId(null);
+        this.withExpectedEmptyContent().runPatch(
+            UserController.PATH_SELECT_USER_CAMP,
+            "test",
+            request,
+            Object.class
+        );
+        assertThat(this.userRepository.findById(1L).orElseThrow().getSettings().getCamp())
+            .isNull();
+    }
+
+    @Test
+    @Order(8)
+    void testSelectUnknownCampReturnsNotFound() throws Exception {
+        UserCampChangeDto selectExistingCamp = new UserCampChangeDto();
+        selectExistingCamp.setId(1L);
+        this.withExpectedEmptyContent().runPatch(
+            UserController.PATH_SELECT_USER_CAMP,
+            "test",
+            selectExistingCamp,
+            Object.class
+        );
+
+        UserCampChangeDto request = new UserCampChangeDto();
+        request.setId(999L);
+
+        this.withExpectedStatus(HttpStatus.NOT_FOUND).runPatch(
+            UserController.PATH_SELECT_USER_CAMP,
+            "test",
+            request,
+            Object.class
+        );
+        assertThat(this.userRepository.findById(1L).orElseThrow().getSettings().getCamp().getId())
+            .isEqualTo(1L);
+    }
+
+    @Test
+    @Order(9)
+    void testSelectUserCampWithoutAuthenticationReturnsUnauthorized() throws Exception {
+        UserCampChangeDto request = new UserCampChangeDto();
+        request.setId(1L);
+
+        this.withExpectedStatus(HttpStatus.UNAUTHORIZED).runPatch(
+            UserController.PATH_SELECT_USER_CAMP,
+            null,
+            request,
+            Object.class
+        );
+    }
+
+    @Test
+    @Order(10)
     void testUpdateOwnSettingsReturnsUpdatedSettings() throws Exception {
         UserSettingsDto request = new UserSettingsDto("/updated", true, false);
         this.addUrlParam("id", 1L);
@@ -66,7 +178,7 @@ class UserControllerTest extends EcisIntegrationTestClient {
     }
 
     @Test
-    @Order(4)
+    @Order(11)
     void testUpdateAnotherUsersSettingsReturnsNotFound() throws Exception {
         UserSettingsDto request = new UserSettingsDto("/forbidden", true, true);
         this.addUrlParam("id", 2L);
@@ -83,7 +195,7 @@ class UserControllerTest extends EcisIntegrationTestClient {
     }
 
     @Test
-    @Order(5)
+    @Order(12)
     void testUpdateSettingsWithoutAuthenticationReturnsUnauthorized() throws Exception {
         UserSettingsDto request = new UserSettingsDto("/unauthenticated", false, false);
         this.addUrlParam("id", 1L);
@@ -97,7 +209,7 @@ class UserControllerTest extends EcisIntegrationTestClient {
     }
 
     @Test
-    @Order(6)
+    @Order(13)
     void testUpdateSettingsWithMissingRequiredFieldsReturnsUnprocessableContent() throws Exception {
         this.addUrlParam("id", 1L);
 
@@ -110,7 +222,7 @@ class UserControllerTest extends EcisIntegrationTestClient {
     }
 
     @Test
-    @Order(7)
+    @Order(14)
     void testUpdateUnknownUsersSettingsReturnsNotFound() throws Exception {
         this.addUrlParam("id", 999L);
 

@@ -52,7 +52,8 @@ public class UserEnt extends VersionAwareEntity<Long> {
     @Column(name = "system_admin", nullable = false)
     private boolean systemAdmin;
 
-    @Column(name = "password_changed", nullable = true)
+    @Setter(AccessLevel.PRIVATE)
+    @Column(name = "password_changed", nullable = true, updatable = true, insertable = true)
     private OffsetDateTime passwordChanged;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

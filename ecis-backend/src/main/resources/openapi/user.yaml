@@ -192,6 +192,47 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorDto"
+  /user/{id}/password:
+    patch:
+      tags:
+        - User
+      operationId: changeUserPassword
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserPasswordChangeDto"
+      responses:
+        "204":
+          description: User password changed
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
 
 components:
   schemas:
@@ -201,6 +242,24 @@ components:
         id:
           type: integer
           format: int64
+    UserPasswordChangeDto:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          maxLength: 255
+        password:
+          type: string
+          maxLength: 255
+        actualPassword:
+          type: string
+          maxLength: 255
+    UserDutyDto:
+      type: object
+
     LovDto:
       type: object
       properties:
@@ -209,9 +268,6 @@ components:
           format: int64
         label:
           type: string
-    UserDutyDto:
-      type: object
-
     ErrorDto:
       type: object
       properties:

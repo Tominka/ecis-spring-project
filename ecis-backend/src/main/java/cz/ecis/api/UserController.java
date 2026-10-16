@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cz.ecis.core.model.LovDto;
 import cz.ecis.model.dto.CampDto;
 import cz.ecis.model.dto.UserCampChangeDto;
+import cz.ecis.model.dto.UserPasswordChangeDto;
 import cz.ecis.model.dto.UserSettingsDto;
 import cz.ecis.service.CampService;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +49,11 @@ public class UserController implements UserApiInterface {
         return ResponseEntity.ok(
             this.userService.updateUserSettings(id, dto)
         );
+    }
+
+    @Override
+    public ResponseEntity<Void> changeUserPassword(Long id, UserPasswordChangeDto dto) {
+        this.userService.changeUserPassword(id, dto);
+        return ResponseEntity.noContent().build();
     }
 }

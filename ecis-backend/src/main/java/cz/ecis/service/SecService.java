@@ -33,6 +33,7 @@ import cz.ecis.core.security.EcisUserDetails;
 import cz.ecis.core.security.EcisUserDetailsService;
 import cz.ecis.core.security.jwt.JwtService;
 import cz.ecis.core.security.jwt.JwtService.JwtType;
+import cz.ecis.core.security.password.EcisPasswordValidator;
 import cz.ecis.core.settings.EcisAppSettings;
 import cz.ecis.core.token.TokenGeneratorService;
 import cz.ecis.core.token.TokenGeneratorService.TokenGeneratorResult;
@@ -73,6 +74,8 @@ public class SecService {
 
     private final EcisAppSettings ecisAppSettings;
 
+    private final EcisPasswordValidator ecisPasswordValidator;
+
     private final PasswordEncoder passwordEncoder;
     private final AccountStatusUserDetailsChecker userDetailsChecker;
     private final EcisUserDetailsService userDetailsService;
@@ -86,7 +89,6 @@ public class SecService {
     private final PasswordResetRepository passwordResetRepository;
 
     private final SecMapper secMapper;
-    
 
     public LoginResponseDto getLoginResponse(LoginRequestDto request) {
 
@@ -322,8 +324,7 @@ public class SecService {
             return;
         }
 
-        if (dto.getPassword().length() <= this.ecisAppSettings.password().minLength()) {
-            LOGGER.warn("Password didn´t meet minimal requirements");
+        if (!this.ecisPasswordValidator.validatePassword(dto.getPassword())) {
             throw new EcisRuntimeException("Password reset token is expired", HttpStatus.BAD_REQUEST);
         }
         

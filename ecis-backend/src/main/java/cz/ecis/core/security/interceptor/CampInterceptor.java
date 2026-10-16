@@ -77,7 +77,9 @@ public class CampInterceptor implements HandlerInterceptor {
 
         EcisContext.getRequest().getEntry().setAuthorized(true);
 
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        if (!(handler instanceof HandlerMethod handlerMethod)) {
+            return true;
+        }
 
         CampSecured annotation = handlerMethod.getMethodAnnotation(CampSecured.class);
 

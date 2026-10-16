@@ -1,5 +1,6 @@
 package cz.ecis.db.ent;
 
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,6 +45,7 @@ public class UserEnt extends VersionAwareEntity<Long> {
     @Column(name = "email", nullable = false, length = 255)
     private String email;
 
+    @Setter(AccessLevel.PRIVATE)
     @Column(name = "password", nullable = false, length = 255)
     private String password;
 
@@ -68,4 +70,9 @@ public class UserEnt extends VersionAwareEntity<Long> {
 
     @Column(name = "2fa_secret", nullable = true, length = 255)
     private String twoFaSecret;
+
+    public void updatePassword(String cryptedPassword) {
+        this.setPassword(cryptedPassword);
+        this.setPasswordChanged(OffsetDateTime.now());
+    }
 }

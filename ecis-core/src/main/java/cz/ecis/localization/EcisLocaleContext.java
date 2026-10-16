@@ -1,11 +1,13 @@
 package cz.ecis.localization;
 
+import java.util.Locale;
+
 import cz.ecis.utils.LocalizationUtils;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class EcisLocaleContext {
 
-    private static final ThreadLocal<String> CONTEXT = new ThreadLocal<>();
+    private static final ThreadLocal<Locale> CONTEXT = new ThreadLocal<>();
 
     private static final String LANGUAGE_HEADER = "Accept-Language";
 
@@ -19,7 +21,7 @@ public class EcisLocaleContext {
         }
     }
 
-    public static String getLocale() {
+    public static Locale getLocale() {
         return CONTEXT.get();
     }
 
@@ -27,7 +29,11 @@ public class EcisLocaleContext {
         CONTEXT.remove();
     }
 
-    private static String getLocale(HttpServletRequest request) {
+    public static String localeString() {
+        return EcisLocaleContext.getLocale().toLanguageTag();
+    }
+
+    private static Locale getLocale(HttpServletRequest request) {
         String locale = request.getHeader(LANGUAGE_HEADER);
         return locale != null ? LocalizationUtils.resolveLocale(locale) : LocalizationUtils.defaultLocaleTag();
     }

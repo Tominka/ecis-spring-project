@@ -3,11 +3,14 @@ package cz.ecis.service;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
@@ -20,21 +23,31 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
 
 import cz.ecis.core.EcisContext;
+import cz.ecis.core.exception.EcisRuntimeException;
 import cz.ecis.core.exception.IllegalRecordStateException;
+import cz.ecis.core.mail.MailService;
 import cz.ecis.core.security.EcisUserDetails;
 import cz.ecis.core.security.EcisUserDetailsService;
 import cz.ecis.core.security.jwt.JwtService;
 import cz.ecis.core.security.jwt.JwtService.JwtType;
+import cz.ecis.core.settings.EcisAppSettings;
+import cz.ecis.core.token.TokenGeneratorService;
+import cz.ecis.core.token.TokenGeneratorService.TokenGeneratorResult;
 import cz.ecis.db.ent.LoginAttemptEnt;
+import cz.ecis.db.ent.PasswordResetEnt;
 import cz.ecis.db.ent.RefreshTokenEnt;
 import cz.ecis.db.ent.UserEnt;
+import cz.ecis.db.repo.PasswordResetRepository;
 import cz.ecis.db.repo.RefreshTokenRepository;
 import cz.ecis.db.repo.UserRepository;
+import cz.ecis.localization.EcisLocaleContext;
 import cz.ecis.mapper.SecMapper;
 import cz.ecis.model.dto.LoginRequestDto;
 import cz.ecis.model.dto.LoginResponseDto;
+import cz.ecis.model.dto.PasswordResetDto;
 import cz.ecis.model.dto.RefreshTokenRequestDto;
 import cz.ecis.model.dto.RequestPasswordResetDto;
 import cz.ecis.model.dto.TwoFaCodeDto;
@@ -42,6 +55,7 @@ import cz.ecis.model.dto.TwoFaQrCodeDto;
 import cz.ecis.model.dto.UserCredentialsDto;
 import cz.ecis.utils.SecurityUtils;
 import dev.samstevens.totp.time.SystemTimeProvider;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import dev.samstevens.totp.code.DefaultCodeGenerator;
 import dev.samstevens.totp.code.DefaultCodeVerifier;
@@ -57,16 +71,22 @@ public class SecService {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private final EcisAppSettings ecisAppSettings;
+
     private final PasswordEncoder passwordEncoder;
     private final AccountStatusUserDetailsChecker userDetailsChecker;
     private final EcisUserDetailsService userDetailsService;
     private final LoginService loginService;
     private final JwtService jwtService;
+    private final MailService mailService;
+    private final TokenGeneratorService tokenGeneratorService;
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
+    private final PasswordResetRepository passwordResetRepository;
 
     private final SecMapper secMapper;
+    
 
     public LoginResponseDto getLoginResponse(LoginRequestDto request) {
 
@@ -243,5 +263,109 @@ public class SecService {
         result.setToken(this.jwtService.generateToken(SecurityUtils.getUserEnt(), JwtType.ACCESS, UUID.randomUUID().toString()));
         result.setTwoFaRequired(false);
         return result;
+    }
+
+    public void requestPasswordReset(RequestPasswordResetDto dto) {
+        if (StringUtils.isEmpty(dto.getEmail())) {
+            return;
+        }
+
+        Optional<UserEnt> userOpt = this.userRepository.findByEmailIgnoreCase(dto.getEmail());
+        if (userOpt.isEmpty()) {
+            this.passwordResetHoneypot();
+            return;
+        }
+        UserEnt user = userOpt.get();
+        Integer minutesValidity = this.ecisAppSettings.password().resetMinutesValid();
+        Integer waitMinutes = ecisAppSettings.password().resetMinutesNextWait();
+
+        PasswordResetEnt ent = this.passwordResetRepository.findFirstByUserIdOrderByGeneratedAtDesc(user.getId())
+        .orElse(null);
+
+        TokenGeneratorResult token;
+        if (ent == null) {
+            token = this.tokenGeneratorService.generateRandomSha256();
+            ent = this.passwordResetRepository.save(
+                this.secMapper.createPasswordReset(user, token.hash(), minutesValidity)
+            );
+        } else if (ent.getLastRequestedAt().plusMinutes(ecisAppSettings.password().resetMinutesNextWait()).isAfter(OffsetDateTime.now())) {
+            LOGGER.warn("Password reset email skipped due to cooldown. Minimum interval: {} minutes.", waitMinutes);
+            this.passwordResetHoneypot();
+            return;
+        } else {
+            // if (ent.getRevokedAt() != null) {
+            //     LOGGER.warn("Password reset is revoked already");
+            //     this.passwordResetHoneypot();
+            //     return;
+            // }
+            token = this.tokenGeneratorService.generateRandomSha256();
+            this.secMapper.updateUsePasswordReset(ent, token.hash(), minutesValidity);
+            ent = this.passwordResetRepository.save(ent);
+        }
+      
+        String resetUrl = String.format("%s?token=%s&email=%s", this.ecisAppSettings.password().resetUrl(), token.raw(), user.getEmail());
+        Context context = new Context(EcisLocaleContext.getLocale());
+        context.setVariable("resetUrl", resetUrl);
+        context.setVariable("expirationMinutes", minutesValidity);
+        try {
+            this.mailService.sendRender(user.getEmail(), "email.password-reset.subject", "password-reset", context);
+        } catch (MessagingException e) {
+            LOGGER.error("Error during sending email to {}", user.getEmail(), e);
+        }
+    }
+
+    @Transactional
+    public void resetPassword(PasswordResetDto dto) {
+        if (StringUtils.isAnyEmpty(dto.getToken(), dto.getEmail(), dto.getPassword())) {
+            LOGGER.warn("One of required properties is empty. Token: {}, Email: {}, PasswordIsNull: {}", dto.getToken(), dto.getEmail(), dto.getPassword() == null);
+            this.passwordResetHoneypot();
+            return;
+        }
+
+        if (dto.getPassword().length() <= this.ecisAppSettings.password().minLength()) {
+            LOGGER.warn("Password didn´t meet minimal requirements");
+            throw new EcisRuntimeException("Password reset token is expired", HttpStatus.BAD_REQUEST);
+        }
+        
+        String tokenHash = DigestUtils.sha256Hex(dto.getToken());
+
+        System.out.println(tokenHash);
+        System.out.println(dto.getToken());
+
+        Optional<PasswordResetEnt> passwordOpt = this.passwordResetRepository.findFirstByUserEmailAndTokenHash(dto.getEmail(), tokenHash);
+        if (passwordOpt.isEmpty()) {
+            LOGGER.warn("Password reset entry not found");
+            this.passwordResetHoneypot();
+            return;
+        }
+        PasswordResetEnt passwordReset = passwordOpt.get();
+        if (passwordReset.getRevokedAt() != null) {
+            LOGGER.warn("Password reset is revoked already");
+            this.passwordResetHoneypot();
+            return;
+        }
+
+
+        OffsetDateTime now = OffsetDateTime.now();
+        if (now.isAfter(passwordReset.getValidTo())) {
+            LOGGER.warn("Password reset token is expired.");
+            throw new EcisRuntimeException("Password reset token is expired", HttpStatus.BAD_REQUEST);
+        }
+        passwordReset.setRevokedAt(now);
+        this.passwordResetRepository.save(passwordReset);
+
+        UserEnt user = passwordReset.getUser();
+        user.updatePassword(this.passwordEncoder.encode(dto.getPassword()));
+        this.userRepository.save(user);
+    }
+
+    private void passwordResetHoneypot() {
+        try {
+            LOGGER.warn("Honeypot for requestPasswordResetHoneypot triggered :)");
+            Thread.sleep(90);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOGGER.warn("Honeypot for requestPasswordResetHoneypot was intterupted :(");
+        }
     }
 }

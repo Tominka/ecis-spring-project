@@ -1491,4 +1491,58 @@
         </sql>
     </changeSet>
 
+    <changeSet id="19-added-password-reset-table" author="Tom">
+        <createTable schemaName="security" tableName="password_reset">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="id_user" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ip_address" type="VARCHAR(45)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="user_agent" type="VARCHAR(510)">
+                <constraints nullable="true" />
+            </column>
+            <column name="token_hash" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="generated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_requested_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+             <column name="valid_to" type="timestamp with time zone">
+                <constraints nullable="false" />
+            </column>
+            <column name="revoked_at" type="timestamp with time zone">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableSchemaName="security"
+            baseTableName="password_reset"
+            baseColumnNames="id_user"
+            referencedTableSchemaName="security"
+            referencedTableName="user"
+            referencedColumnNames="id"
+            constraintName="password_reset_id_user_fk"
+        />
+
+        <createIndex schemaName="security" tableName="password_reset" indexName="password_reset_id_user_idx">
+            <column name="id_user"/>
+        </createIndex>
+
+        <createIndex schemaName="security" tableName="password_reset" indexName="password_reset_revoked_at_idx">
+            <column name="revoked_at"/>
+        </createIndex>
+
+        <sql dbms="postgresql" endDelimiter=";">
+            GRANT SELECT, UPDATE, INSERT ON TABLE security.password_reset TO ecis_apl;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

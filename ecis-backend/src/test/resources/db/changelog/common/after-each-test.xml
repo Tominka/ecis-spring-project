@@ -7,6 +7,10 @@
     logicalFilePath="after-each-test.xml"
 >
 
+    <changeSet id="${test.uuid}-password-reset-cleanup" author="Tom">
+        <delete schemaName="security" tableName="password_reset" />
+    </changeSet>
+
     <changeSet id="${test.uuid}-user-test-data-1" author="Tom">
         <delete schemaName="security" tableName="camp_role" />
         <delete schemaName="security" tableName="user" />

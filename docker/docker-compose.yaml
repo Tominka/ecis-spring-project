@@ -29,6 +29,17 @@ services:
       -  ecis-test-database-data:/var/lib/postgresql
       - ./initdb:/docker-entrypoint-initdb.d
 
+  ecis-maildev:
+    image: maildev/maildev:latest
+    container_name: ecis-maildev
+    ports:
+      - "127.0.0.1:1025:1025" # SMTP
+      - "127.0.0.1:1080:1080" # Web UI
+    restart: unless-stopped
+    networks: 
+      - ecis-network
+
+
 volumes:
   ecis-database-data:
   ecis-test-database-data:

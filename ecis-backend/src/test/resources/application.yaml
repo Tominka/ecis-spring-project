@@ -37,6 +37,12 @@ springdoc:
 ecis:
   app:
     displayAppName: TestApp
+    url: http://localhost:4200
+    password:
+      resetUrl: "http://localhost:4200/password-reset"
+      resetMinutesValid: 20
+      resetMinutesNextWait: 5
+      minLength: 16
   login:
     enableAttemptProtection: true
     enablePasswordExpiration: true
@@ -54,5 +60,11 @@ ecis:
     defaultAuditor: SYSTEM
   storage:
     directory: "storage"
+  # mail:
+  #   host: smtp.example.com
+  #   port: 587
+  #   username: ${MAIL_USERNAME}
+  #   password: ${MAIL_PASSWORD}
+  #   from: noreply@example.com
 
 testing: true

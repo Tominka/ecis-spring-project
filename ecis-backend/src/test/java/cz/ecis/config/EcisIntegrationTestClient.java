@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import cz.ecis.EcisTestApplication;
 import cz.ecis.api.SecController;
@@ -38,6 +39,13 @@ public abstract class EcisIntegrationTestClient extends EcisIntegrationTest  {
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
         registry.add("ecis.storage.directory", TEMP_DIR::toString);
+        PostgreSQLContainer postgres = TestContainerConfig.getPostgresContainer();
+        registry.add("spring.datasource.jdbc-url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.liquibase.jdbc-url", postgres::getJdbcUrl);
+        registry.add("spring.liquibase.username", postgres::getUsername);
+        registry.add("spring.liquibase.password", postgres::getPassword);
     }
 
     @Override

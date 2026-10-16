@@ -98,6 +98,12 @@ springdoc:
 ecis:
   app:
     displayAppName: DevApp
+    url: http://localhost:4200
+    password:
+      resetUrl: "http://localhost:4200/password-reset"
+      resetMinutesValid: 20
+      resetMinutesNextWait: 5
+      minLength: 16
   storage:
     directory: "storage"
   login:
@@ -115,3 +121,9 @@ ecis:
       validity: 86400
   audit:
     defaultAuditor: SYSTEM
+  mail:
+    host: localhost
+    port: 1025
+    username: ""
+    password: ""
+    from: noreply@ecis.local

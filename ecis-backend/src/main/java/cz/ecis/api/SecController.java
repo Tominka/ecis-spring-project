@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import cz.ecis.core.security.annotation.CampSecured;
 import cz.ecis.model.dto.LoginRequestDto;
 import cz.ecis.model.dto.LoginResponseDto;
+import cz.ecis.model.dto.PasswordResetDto;
 import cz.ecis.model.dto.RefreshTokenRequestDto;
+import cz.ecis.model.dto.RequestPasswordResetDto;
 import cz.ecis.model.dto.TwoFaCodeDto;
 import cz.ecis.model.dto.TwoFaQrCodeDto;
 import cz.ecis.model.dto.UserCredentialsDto;
@@ -72,6 +74,18 @@ public class SecController implements SecApiInterface {
         return ResponseEntity.ok(
             this.secService.refreshToken(dto)
         );
+    }
+
+    @Override
+    public ResponseEntity<Void> requestPasswordReset(RequestPasswordResetDto dto) {
+        this.secService.requestPasswordReset(dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> resetPassword(PasswordResetDto dto) {
+        this.secService.resetPassword(dto);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -16,6 +16,7 @@
 	<modules>
 		<module>ecis-backend</module>
 		<module>ecis-external-backend</module>
+		<module>ecis-mail-core</module>
 		<module>ecis-core</module>
 		<module>ecis-test-core</module>
 	</modules>
@@ -69,6 +70,18 @@
 			</dependency>
 
 			<dependency>
+				<groupId>org.eclipse.angus</groupId>
+				<artifactId>angus-mail</artifactId>
+				<version>2.0.3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.thymeleaf</groupId>
+				<artifactId>thymeleaf</artifactId>
+				<version>3.1.5.RELEASE</version>
+			</dependency>
+
+			<dependency>
 				<groupId>org.springdoc</groupId>
 				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 				<version>3.1.1</version>
@@ -78,6 +91,20 @@
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
 				<version>2.22.0</version>
+				<scope>compile</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.21.0</version>
+				<scope>compile</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.23.0</version>
 				<scope>compile</scope>
 			</dependency>
 

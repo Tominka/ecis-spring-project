@@ -23,7 +23,7 @@ public interface LookupBaseMapper {
     }
 
     public static String getLovMappingLabel(EcisLookupEntity<Long> ent) {
-        EcisLookupTranslation trans = ent.getTranslations().get(EcisLocaleContext.getLocale());
+        EcisLookupTranslation trans = ent.getTranslations().get(EcisLocaleContext.getLocale().getLanguage());
         if (trans != null) {
             return trans.getName();
         }

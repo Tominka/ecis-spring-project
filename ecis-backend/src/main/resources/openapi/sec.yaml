@@ -49,6 +49,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorDto"
+        "429":
+          description: Too much password reset requests. Please wait before another password reset submit
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
         "500":
           description: Unexpected server error
           content:
@@ -275,6 +281,87 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorDto"
 
+  /sec/request-password-reset:
+    post:
+      tags:
+        - Security
+      operationId: requestPasswordReset
+      summary: Request password reset
+      description: Requests password reset
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestPasswordResetDto"
+        required: true
+      responses:
+        "204":
+          description: Password reset email sent
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+  /sec/password-reset:
+    post:
+      tags:
+        - Security
+      operationId: resetPassword
+      summary: Reset password
+      description: Resets password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordResetDto"
+        required: true
+      responses:
+        "204":
+          description: Password was reseted
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+
 components:
   schemas:
     LoginRequestDto:
@@ -346,6 +433,25 @@ components:
         twoFaCode:
           type: integer
           format: int32
+    RequestPasswordResetDto:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+    PasswordResetDto:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        password:
+          type: string
+          maxLength: 255
+        token:
+          type: string
     ErrorDto:
       type: object
       properties:

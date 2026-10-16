@@ -1,7 +1,5 @@
 package cz.ecis.config;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -14,9 +12,23 @@ import org.testcontainers.utility.DockerImageName;
 @TestConfiguration
 public class TestContainerConfig {
 
-    @Bean(initMethod = "start", destroyMethod = "stop")
+    private static final PostgreSQLContainer POSTGRES = createPostgresContainer();
+
+    @Bean(destroyMethod = "stop")
     @SuppressWarnings({"resource", "java:S2095"})
     PostgreSQLContainer postgreContainer() {
+        return getPostgresContainer();
+    }
+
+    public static synchronized PostgreSQLContainer getPostgresContainer() {
+        if (!POSTGRES.isRunning()) {
+            POSTGRES.start();
+        }
+        return POSTGRES;
+    }
+
+    @SuppressWarnings({"resource", "java:S2095"})
+    private static PostgreSQLContainer createPostgresContainer() {
         PostgreSQLContainer postgres = new PostgreSQLContainer(
             DockerImageName.parse("postgres:18.4")
         )
@@ -25,12 +37,9 @@ public class TestContainerConfig {
             .withPassword("ecis")
             .withInitScript("db/init.sql");
 
-        postgres.setPortBindings(List.of("15432:5432"));
-
         postgres.waitingFor(
             Wait.forLogMessage(".*database system is ready to accept connections.*\\s", 1)
         );
-
         return postgres;
     }
 

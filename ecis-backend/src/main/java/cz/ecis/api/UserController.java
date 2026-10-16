@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cz.ecis.core.model.LovDto;
 import cz.ecis.model.dto.CampDto;
 import cz.ecis.model.dto.UserCampChangeDto;
+import cz.ecis.model.dto.UserSettingsDto;
 import cz.ecis.service.CampService;
 import lombok.RequiredArgsConstructor;
 
@@ -40,5 +41,12 @@ public class UserController implements UserApiInterface {
     @Override
     public ResponseEntity<Object> getUserDuties() {
         return ResponseEntity.ok(new Object());
+    }
+
+    @Override
+    public ResponseEntity<UserSettingsDto> updateUserSettings(Long id, UserSettingsDto dto) {
+        return ResponseEntity.ok(
+            this.userService.updateUserSettings(id, dto)
+        );
     }
 }

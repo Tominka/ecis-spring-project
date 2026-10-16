@@ -20,13 +20,13 @@ public class UserSettingsEnt extends VersionAwareEntity<Long> {
 
     private static final long serialVersionUID = -1L;
 
-    @Column(name = "default_page", length = 512)
+    @Column(name = "default_page", length = 512, insertable = true, updatable = true)
     private String defaultPage;
 
-    @Column(name = "default_page_after_login")
+    @Column(name = "default_page_after_login", insertable = true, updatable = true)
     private boolean defaultPageAfterLogin;
 
-    @Column(name = "default_page_after_refresh")
+    @Column(name = "default_page_after_refresh", insertable = true, updatable = true)
     private boolean defaultPageAfterRefresh;
 
     @ManyToOne(fetch = FetchType.EAGER)

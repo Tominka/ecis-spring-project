@@ -10,19 +10,14 @@ import cz.ecis.core.EcisContext;
 import cz.ecis.db.ent.LogEntryEnt;
 import cz.ecis.db.ent.PasswordResetEnt;
 import cz.ecis.db.ent.UserEnt;
-import cz.ecis.db.ent.UserSettingsEnt;
 import cz.ecis.model.dto.UserCredentialsDto;
-import cz.ecis.model.dto.UserSettingsDto;
 
-@Mapper(componentModel = "spring", config = DefaultMapperConfig.class)
+@Mapper(componentModel = "spring", config = DefaultMapperConfig.class, uses = {UserMapper.class})
 public interface SecMapper {
 
     @Mapping(source = "systemAdmin", target = "isSystemAdmin")
     @Mapping(source = "twoFaEnabled", target = "is2FaEnabled")
     UserCredentialsDto userToCredentialsDto(UserEnt user);
-
-    @Mapping(source = "camp.id", target = "selectedCampId")
-    UserSettingsDto userSetingsToDto(UserSettingsEnt ent);
 
     default PasswordResetEnt createPasswordReset(UserEnt user, String tokenHash, Integer minutesValid) {
         OffsetDateTime now = OffsetDateTime.now();

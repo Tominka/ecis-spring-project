@@ -147,6 +147,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorDto"
+  /user/{id}/settings:
+    put:
+      tags:
+        - User
+      operationId: updateUserSettings
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./sec.yaml#/components/schemas/UserSettingsDto"
+      responses:
+        "200":
+          description: Camp selected
+          content:
+            application/json:
+              schema:
+                $ref: "./sec.yaml#/components/schemas/UserSettingsDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
 
 components:
   schemas:

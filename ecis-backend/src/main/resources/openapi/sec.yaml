@@ -393,6 +393,9 @@ components:
     UserCredentialsDto:
       type: object
       properties:
+        id:
+          type: integer
+          format: int64
         username:
           type: string
         fullname:
@@ -405,6 +408,10 @@ components:
           type: boolean
     UserSettingsDto:
       type: object
+      required:
+        - defaultPage
+        - defaultPageAfterLogin
+        - defaultPageAfterRefresh
       properties:
         defaultPage:
           type: string

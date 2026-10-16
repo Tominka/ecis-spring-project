@@ -338,11 +338,13 @@
 							<apiNameSuffix>ApiInterface</apiNameSuffix>
 							<importMappings>
 								CampDto=cz.ecis.model.dto.CampDto,
+								UserSettingsDto=cz.ecis.model.dto.UserSettingsDto,
 								LovDto=cz.ecis.core.model.LovDto,
 								ErrorDto=cz.ecis.core.model.ErrorDto
 							</importMappings>
 							<typeMappings>
 								CampDto=cz.ecis.model.dto.CampDto,
+								UserSettingsDto=cz.ecis.model.dto.UserSettingsDto,
 								LovDto=cz.ecis.core.model.LovDto,
 								ErrorDto=cz.ecis.core.model.ErrorDto
 							</typeMappings>

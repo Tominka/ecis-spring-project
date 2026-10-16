@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -15,10 +16,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cz.ecis.core.security.EcisRoleEnum;
 import cz.ecis.core.security.annotation.CampSecured;
 import cz.ecis.model.dto.ApplicationCreateDto;
 import cz.ecis.model.dto.ApplicationDto;
 import cz.ecis.model.dto.ApplicationOverviewDto;
+import cz.ecis.model.dto.ChildFilterDto;
 import cz.ecis.service.ApplicationService;
 import cz.ecis.service.ApplicationService.ApplicationContentResult;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +39,12 @@ public class ApplicationController implements ApplicationApiInterface {
         return ResponseEntity.ok(
             this.applicationService.getAllApplications()
         );
+    }
+
+    @Override
+    @CampSecured(roles = {EcisRoleEnum.CHILDREN_READ})
+    public ResponseEntity<List<ApplicationOverviewDto>> searchApplications(@Nullable ChildFilterDto filter) {
+        return ResponseEntity.ok(this.applicationService.search(filter));
     }
 
     @Override

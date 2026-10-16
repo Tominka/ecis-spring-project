@@ -85,6 +85,47 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorDto"
+  /application/search:
+    post:
+      tags:
+        - Application
+      operationId: searchApplications
+      security:
+        - bearerAuth: []
+        - campContext: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./child.yaml#/components/schemas/ChildFilterDto"
+              
+      responses:
+        "200":
+          description: Fetched applications in specified camp
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ApplicationOverviewDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
   /application/{id}:
     get:
       tags:

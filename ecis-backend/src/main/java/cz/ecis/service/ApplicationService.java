@@ -14,11 +14,16 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
+
+import com.querydsl.core.types.Predicate;
 
 import cz.ecis.core.exception.DocumentException;
 import cz.ecis.core.security.CampSecurityContext;
 import cz.ecis.core.settings.EcisStorageSettings;
+import cz.ecis.criteria.ApplicationOverviewVieCriteria;
+import cz.ecis.criteria.ChildCriteria;
 import cz.ecis.db.ent.ApplicationDocumentEnt;
 import cz.ecis.db.ent.ApplicationEnt;
 import cz.ecis.db.ent.ApplicationParentEnt;
@@ -35,6 +40,8 @@ import cz.ecis.model.dto.ApplicationCreateDto;
 import cz.ecis.model.dto.ApplicationDocumentCreateDto;
 import cz.ecis.model.dto.ApplicationDto;
 import cz.ecis.model.dto.ApplicationOverviewDto;
+import cz.ecis.model.dto.ChildDto;
+import cz.ecis.model.dto.ChildFilterDto;
 import cz.ecis.model.dto.ParentDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +66,14 @@ public class ApplicationService {
         return this.applicationOverviewVieRepository.findAll().stream()
             .map(this.applicationMapper::toOverviewDto)
             .toList();
+    }
+
+    public List<ApplicationOverviewDto> search(@Nullable ChildFilterDto filter) {
+        Long camp = CampSecurityContext.getCampId();
+            Predicate criteria = ApplicationOverviewVieCriteria.byChildFilter(filter, camp);
+            return this.applicationOverviewVieRepository.findAll(criteria).stream()
+                .map(this.applicationMapper::toOverviewDto)
+                .toList();
     }
 
     public ApplicationDto createApplication(ApplicationCreateDto dto) {

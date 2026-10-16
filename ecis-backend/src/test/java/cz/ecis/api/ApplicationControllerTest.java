@@ -21,6 +21,7 @@ import cz.ecis.model.dto.ApplicationDocumentDto;
 import cz.ecis.model.dto.ApplicationDto;
 import cz.ecis.model.dto.ApplicationOverviewDto;
 import cz.ecis.model.dto.ChildDto;
+import cz.ecis.model.dto.ChildFilterDto;
 import cz.ecis.model.dto.ParentDto;
 import tools.jackson.core.type.TypeReference;
 
@@ -178,6 +179,63 @@ class ApplicationControllerTest extends EcisIntegrationTestClient {
 
         assertThat(resource.getFilename()).isEqualTo("neco.txt");
         assertThat(resource.getContentAsByteArray()).isEqualTo(new byte[] {1,2,3,4,5});
+    }
+
+    @Test
+    @Order(5)
+    void testSearchApplications() throws Exception {
+        ChildFilterDto filter = new ChildFilterDto();
+
+        List<ApplicationOverviewDto> applications = this.withHeader("X-Camp-Id", "1").runPost(
+            ApplicationController.PATH_SEARCH_APPLICATIONS,
+            "test",
+            filter,
+            new TypeReference<List<ApplicationOverviewDto>>() {}
+        );
+        assertThat(applications).hasSize(1);
+        assertThat(applications.get(0).getChild()).isNotNull();
+        assertThat(applications.get(0).getChild().getName()).isEqualTo("Jmeno");
+
+        filter.name("Jme");
+        applications = this.withHeader("X-Camp-Id", "1").runPost(
+            ApplicationController.PATH_SEARCH_APPLICATIONS,
+            "test",
+            filter,
+            new TypeReference<List<ApplicationOverviewDto>>() {}
+        );
+        assertThat(applications).hasSize(1);
+
+        filter.name("No matching child");
+        applications = this.withHeader("X-Camp-Id", "1").runPost(
+            ApplicationController.PATH_SEARCH_APPLICATIONS,
+            "test",
+            filter,
+            new TypeReference<List<ApplicationOverviewDto>>() {}
+        );
+        assertThat(applications).isEmpty();
+
+        filter.name(null)
+            .surname("Prijmeni")
+            .address("Adresa")
+            .birthdate(LocalDate.of(2022, 1, 5));
+        applications = this.withHeader("X-Camp-Id", "1").runPost(
+            ApplicationController.PATH_SEARCH_APPLICATIONS,
+            "test",
+            filter,
+            new TypeReference<List<ApplicationOverviewDto>>() {}
+        );
+        assertThat(applications).hasSize(1);
+        assertThat(applications.get(0).getChild()).isNotNull();
+        assertThat(applications.get(0).getChild().getSurname()).isEqualTo("Prijmeni");
+
+        filter.address("Different address");
+        applications = this.withHeader("X-Camp-Id", "1").runPost(
+            ApplicationController.PATH_SEARCH_APPLICATIONS,
+            "test",
+            filter,
+            new TypeReference<List<ApplicationOverviewDto>>() {}
+        );
+        assertThat(applications).isEmpty();
     }
 
 }

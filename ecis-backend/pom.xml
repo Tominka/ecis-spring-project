@@ -306,6 +306,7 @@
 								ParentDto=cz.ecis.model.dto.ParentDto,
 								ChildDto=cz.ecis.model.dto.ChildDto,
 								CampDto=cz.ecis.model.dto.CampDto,
+								ChildFilterDto=cz.ecis.model.dto.ChildFilterDto,
 								EnvTypeEnum=cz.ecis.core.environment.EnvTypeEnum,
 								ErrorDto=cz.ecis.core.model.ErrorDto
 							</importMappings>
@@ -313,6 +314,7 @@
 								ParentDto=cz.ecis.model.dto.ParentDto,
 								ChildDto=cz.ecis.model.dto.ChildDto,
 								CampDto=cz.ecis.model.dto.CampDto,
+								ChildFilterDto=cz.ecis.model.dto.ChildFilterDto,
 								EnvTypeEnum=cz.ecis.core.environment.EnvTypeEnum,
 								ErrorDto=cz.ecis.core.model.ErrorDto
 							</typeMappings>

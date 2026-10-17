@@ -22,6 +22,7 @@ import cz.ecis.model.dto.ApplicationDto;
 import cz.ecis.model.dto.ApplicationOverviewDto;
 import cz.ecis.model.dto.ChildDto;
 import cz.ecis.model.dto.ChildFilterDto;
+import cz.ecis.model.dto.ErrorDto;
 import cz.ecis.model.dto.ParentDto;
 import tools.jackson.core.type.TypeReference;
 
@@ -236,6 +237,50 @@ class ApplicationControllerTest extends EcisIntegrationTestClient {
             new TypeReference<List<ApplicationOverviewDto>>() {}
         );
         assertThat(applications).isEmpty();
+    }
+
+    @Test
+    @Order(6)
+    void testCancelApplication() throws Exception {
+
+        ApplicationDto createdApplication = this.createdApplications.get(0);
+
+        assertThat(createdApplication.getCanceledAt()).isNull();
+
+        this.addUrlParam("id", createdApplication.getId());
+        ApplicationOverviewDto dto =  this.withHeader("X-Camp-Id", "1")
+            .runPost(ApplicationController.PATH_CANCEL_APPLICATION, "test", null, ApplicationOverviewDto.class);
+
+        assertThat(dto.getCanceledAt()).isNotNull();
+
+        this.addUrlParam("id", createdApplication.getId());
+        ErrorDto errorDto = this.withHeader("X-Camp-Id", "1")
+            .withExpectedStatus(HttpStatus.BAD_REQUEST)
+            .runPost(ApplicationController.PATH_CANCEL_APPLICATION, "test", null, ErrorDto.class);
+
+        assertThat(errorDto.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @Order(7)
+    void testConfirmApplication() throws Exception {
+
+        ApplicationDto createdApplication = this.createdApplications.get(0);
+
+        assertThat(createdApplication.getConfirmedAt()).isNull();
+
+        this.addUrlParam("id", createdApplication.getId());
+        ApplicationOverviewDto dto =  this.withHeader("X-Camp-Id", "1")
+            .runPost(ApplicationController.PATH_CONFIRM_APPLICATION, "test", null, ApplicationOverviewDto.class);
+
+        assertThat(dto.getConfirmedAt()).isNotNull();
+
+        this.addUrlParam("id", createdApplication.getId());
+        ErrorDto errorDto = this.withHeader("X-Camp-Id", "1")
+            .withExpectedStatus(HttpStatus.BAD_REQUEST)
+            .runPost(ApplicationController.PATH_CONFIRM_APPLICATION, "test", null, ErrorDto.class);
+
+        assertThat(errorDto.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
 }

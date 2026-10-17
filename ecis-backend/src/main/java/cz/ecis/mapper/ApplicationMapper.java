@@ -38,6 +38,9 @@ public interface ApplicationMapper {
 
     ApplicationOverviewDto toOverviewDto(ApplicationOverviewVieEnt ent);
 
+    @Mapping(target = "documentCount", expression = "java(ent.getDocuments() == null ? 0L : (long) ent.getDocuments().size())")
+    ApplicationOverviewDto toOverviewDto(ApplicationEnt ent);
+
     @Mapping(source = "parent", target = ".")
     ParentDto toParentDto(ApplicationParentEnt ent);
 }

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -15,17 +16,19 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.Nullable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.querydsl.core.types.Predicate;
 
 import cz.ecis.core.exception.DocumentException;
+import cz.ecis.core.exception.EcisRuntimeException;
 import cz.ecis.core.security.CampSecurityContext;
 import cz.ecis.core.settings.EcisStorageSettings;
 import cz.ecis.criteria.ApplicationOverviewVieCriteria;
-import cz.ecis.criteria.ChildCriteria;
 import cz.ecis.db.ent.ApplicationDocumentEnt;
 import cz.ecis.db.ent.ApplicationEnt;
+import cz.ecis.db.ent.ApplicationOverviewVieEnt;
 import cz.ecis.db.ent.ApplicationParentEnt;
 import cz.ecis.db.ent.CampEnt;
 import cz.ecis.db.ent.ChildEnt;
@@ -40,7 +43,6 @@ import cz.ecis.model.dto.ApplicationCreateDto;
 import cz.ecis.model.dto.ApplicationDocumentCreateDto;
 import cz.ecis.model.dto.ApplicationDto;
 import cz.ecis.model.dto.ApplicationOverviewDto;
-import cz.ecis.model.dto.ChildDto;
 import cz.ecis.model.dto.ChildFilterDto;
 import cz.ecis.model.dto.ParentDto;
 import jakarta.transaction.Transactional;
@@ -99,6 +101,36 @@ public class ApplicationService {
         }
         return new ApplicationContentResult(document.getFilename(), data);
     };
+
+    @Transactional
+    public ApplicationOverviewDto cancelApplication(Long id) {
+        ApplicationEnt ent = this.getById(id);
+
+        if (ent.getCanceledAt() != null) {
+            throw new EcisRuntimeException("Application is already canceled", HttpStatus.BAD_REQUEST);
+        }
+
+        ent.setConfirmedAt(null);
+        ent.setCanceledAt(OffsetDateTime.now());
+
+        this.applicationRepository.save(ent);
+        return this.applicationMapper.toOverviewDto(ent);
+    }
+
+    @Transactional
+    public ApplicationOverviewDto confirmApplication(Long id) {
+        ApplicationEnt ent = this.getById(id);
+
+        if (ent.getConfirmedAt() != null) {
+            throw new EcisRuntimeException("Application is already canceled", HttpStatus.BAD_REQUEST);
+        }
+
+        ent.setConfirmedAt(OffsetDateTime.now());
+        ent.setCanceledAt(null);
+
+        this.applicationRepository.save(ent);
+        return this.applicationMapper.toOverviewDto(ent);
+    }
 
     private ApplicationEnt getById(Long id) {
         Long campId = CampSecurityContext.getCampId();

@@ -2,6 +2,9 @@ package cz.ecis.db.ent;
 
 import java.time.OffsetDateTime;
 
+import org.hibernate.annotations.Immutable;
+
+import cz.ecis.core.ent.ICampEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -13,9 +16,10 @@ import lombok.Setter;
 
 @Entity
 @Table(schema = "ecis", name = "application_overview_vie")
+@Immutable
 @Getter
 @Setter
-public class ApplicationOverviewVieEnt {
+public class ApplicationOverviewVieEnt implements ICampEntity {
 
     @Id
     @Column(name = "id", nullable = false)

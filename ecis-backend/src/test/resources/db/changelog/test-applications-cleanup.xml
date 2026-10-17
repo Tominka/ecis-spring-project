@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <changeSet id="${test.uuid}-remove-applications-test-data" author="T">
+    <changeSet id="${test.uuid}-applications-test-data" author="T">
         <delete schemaName="ecis" tableName="application_document" />
         <delete schemaName="ecis" tableName="application_parent" />
         <delete schemaName="ecis" tableName="application" />

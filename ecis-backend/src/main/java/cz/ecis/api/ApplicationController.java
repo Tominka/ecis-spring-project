@@ -64,6 +64,7 @@ public class ApplicationController implements ApplicationApiInterface {
     }
 
     @Override
+    @CampSecured
     public ResponseEntity<Resource> getApplicationDocumentContentById(Long id, UUID documentId) {
         ApplicationContentResult result = this.applicationService.getApplicationDocumentResult(id, documentId);
 
@@ -81,5 +82,21 @@ public class ApplicationController implements ApplicationApiInterface {
             .contentLength(result.data().length)
             .body(new ByteArrayResource(result.data()));
 
+    }
+
+    @Override
+    @CampSecured
+    public ResponseEntity<ApplicationOverviewDto> confirmApplication(Long id) {
+        return ResponseEntity.ok(
+            this.applicationService.confirmApplication(id)
+        );
+    }
+
+    @Override
+    @CampSecured
+    public ResponseEntity<ApplicationOverviewDto> cancelApplication(Long id) {
+        return ResponseEntity.ok(
+            this.applicationService.cancelApplication(id)
+        );
     }
 }

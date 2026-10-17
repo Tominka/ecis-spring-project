@@ -213,6 +213,86 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorDto"
+  /application/{id}/cancellation:
+    post:
+      tags:
+        - Application
+      operationId: cancelApplication
+      security:
+        - bearerAuth: []
+        - campContext: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Application canceled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationOverviewDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+  /application/{id}/confirmation:
+    post:
+      tags:
+        - Application
+      operationId: confirmApplication
+      security:
+        - bearerAuth: []
+        - campContext: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Application confirmed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationOverviewDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
+        "500":
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
 components:
   schemas:
     ApplicationOverviewDto:
